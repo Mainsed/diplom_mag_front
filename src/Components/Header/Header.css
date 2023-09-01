@@ -1,0 +1,8 @@
+.header {
+  background-color: #395C6B;
+  border-bottom: black 1px solid;
+  color: white;
+}
+.headerElem {
+  height: fit-content;
+}

@@ -1,3 +1,8 @@
-.pageElem {
+.appElem {
   width: 100%;
+  height: fit-content;
+}
+
+.app {
+  height: 100%;
 }

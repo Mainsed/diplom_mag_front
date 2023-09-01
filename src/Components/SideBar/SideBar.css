@@ -1,0 +1,16 @@
+.sideBarLink:hover {
+  background-color: #a0c3f0;
+}
+
+.sideBarLinkActive {
+  background-color: #82b0eb !important;
+}
+
+.sideBarLink {
+  background-color: #BCD3F2;
+  text-decoration: none;
+  color: black;
+  width: 100%;
+  height: 100%;
+  padding: 10px;
+}

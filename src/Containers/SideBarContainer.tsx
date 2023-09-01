@@ -3,11 +3,8 @@ import React, { useEffect } from 'react';
 import SideBar from '../Components/SideBar/SideBar';
 
 const SideBarContainer = (props: any) => {
-  useEffect(() => {
-  }, []);
-  return (
-    <SideBar {...props} />
-  );
+  useEffect(() => {}, []);
+  return <SideBar {...props} />;
 };
 
 const mapStateToProps = (state: any) => {

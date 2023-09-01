@@ -1,0 +1,8 @@
+.footer {
+  background-color: #395C6B;
+  border-top: black 1px solid;
+  color: white;
+}
+.footerElem {
+  height: fit-content;
+}

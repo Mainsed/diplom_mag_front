@@ -3,11 +3,8 @@ import React, { useEffect } from 'react';
 import Header from '../Components/Header/Header';
 
 const HeaderContainer = (props: any) => {
-  useEffect(() => {
-  }, []);
-  return (
-    <Header {...props} />
-  );
+  useEffect(() => {}, []);
+  return <Header {...props} />;
 };
 
 const mapStateToProps = (state: any) => {
