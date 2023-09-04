@@ -4,7 +4,7 @@ import {
   Grid,
   Menu,
   MenuItem,
-  Typography,
+  Typography
 } from '@mui/material';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
@@ -50,10 +50,9 @@ const Header = (): JSX.Element => {
             MenuListProps={{
               'aria-labelledby': 'basic-button',
             }}
+            disableScrollLock={true}
           >
-            <MenuItem onClick={handleClose}>Profile</MenuItem>
-            <MenuItem onClick={handleClose}>My account</MenuItem>
-            <MenuItem onClick={handleClose}>Logout</MenuItem>
+            <MenuItem onClick={handleClose}>Вийти</MenuItem>
           </Menu>
         </Grid>
       </Grid>

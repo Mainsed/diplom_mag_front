@@ -3,7 +3,7 @@ import generalReducer from './generalReducer';
 import ReduxThunk from 'redux-thunk';
 
 const reducers = combineReducers({
-  general: generalReducer
+  general: generalReducer,
 });
 
 const store = createStore(reducers, applyMiddleware(ReduxThunk));

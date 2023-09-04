@@ -8,28 +8,17 @@ import FooterContainer from './Containers/FooterContainer';
 
 const App = () => {
   return (
-    <Grid
-      container
-      justifyContent={'space-between'}
-      direction={'column'}
-      className="app"
-    >
-      <Grid container>
-        <Grid item className="appElem">
-          <HeaderContainer />
+    <Grid container className="app">
+      <HeaderContainer />
+      <Grid container className="mainElem">
+        <Grid item xs={4} sm={2.5} lg={1.3}>
+          <SideBarContainer />
         </Grid>
-        <Grid item className="appElem">
-          <Grid container>
-            <Grid item xs={3} sm={2} lg={1}>
-              <SideBarContainer />
-            </Grid>
-            <Grid item xs={9} sm={10} lg={11}>
-              <MainContentContainer />
-            </Grid>
-          </Grid>
+        <Grid item xs={8} sm={9.5} lg={10.7}>
+          <MainContentContainer />
         </Grid>
       </Grid>
-      <Grid item className="appElem">
+      <Grid className="appElem">
         <FooterContainer />
       </Grid>
     </Grid>

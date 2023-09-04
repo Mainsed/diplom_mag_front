@@ -1,9 +1,14 @@
-import { Grid } from '@mui/material';
+import { Route, Routes, Navigate } from 'react-router-dom';
 import React from 'react';
-import './MainContent.css';
+import { Box } from '@mui/material';
+import StaffContainer from '../../Containers/StaffContainer';
 
-const MainContent = (): JSX.Element => {
-  return <Grid>main</Grid>;
-};
-
+const MainContent = () =>
+  <Box style={{ padding: '20px' }}>
+    <Routes>
+      <Route path={'/staff'} element={<StaffContainer />} />
+      <Route path={'/clients'} element={<div />} />
+      <Route path="*" element={<Navigate to="/staff" />} />
+    </Routes>
+  </Box>;
 export default MainContent;

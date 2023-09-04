@@ -2,6 +2,7 @@
   background-color: #395C6B;
   border-bottom: black 1px solid;
   color: white;
+  height: fit-content;
 }
 .headerElem {
   height: fit-content;

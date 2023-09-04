@@ -1,4 +1,4 @@
-import { Grid, Paper } from '@mui/material';
+import { Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './SideBar.css';
@@ -8,12 +8,20 @@ const SideBar = (): JSX.Element => {
     <Paper elevation={5} className="sideBar">
       <Grid container>
         <NavLink
+          to="/staff"
+          className={({ isActive }) =>
+            isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
+          }
+        >
+          <Typography variant="h6">Працівники</Typography>
+        </NavLink>
+        <NavLink
           to="/clients"
           className={({ isActive }) =>
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Клієнти
+          <Typography variant="h6">Клієнти</Typography>
         </NavLink>
         <NavLink
           to="/cloth"
@@ -21,7 +29,7 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Товари
+          <Typography variant="h6">Товари</Typography>
         </NavLink>
         <NavLink
           to="/orders"
@@ -29,7 +37,7 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Замовлення
+          <Typography variant="h6">Замовлення</Typography>
         </NavLink>
         <NavLink
           to="/stores"
@@ -37,7 +45,7 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Магазини
+          <Typography variant="h6">Магазини</Typography>
         </NavLink>
         <NavLink
           to="/delivery"
@@ -45,7 +53,7 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Поставки
+          <Typography variant="h6">Поставки</Typography>
         </NavLink>
         <NavLink
           to="/reports"
@@ -53,7 +61,7 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          Звіти
+          <Typography variant="h6">Звіти</Typography>
         </NavLink>
       </Grid>
     </Paper>
