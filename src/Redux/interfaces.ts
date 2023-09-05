@@ -4,6 +4,7 @@ export interface IStaff {
   email: string;
   isAdmin: boolean;
   password: string;
+  position: string,
   createdBy: string;
   createdAt: string;
   updatedBy: string;

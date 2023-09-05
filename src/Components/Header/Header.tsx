@@ -4,7 +4,7 @@ import {
   Grid,
   Menu,
   MenuItem,
-  Typography
+  Typography,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';

@@ -1,8 +1,10 @@
 import {
   Button,
+  Checkbox,
   Dialog,
   DialogContent,
   DialogTitle,
+  Drawer,
   FormControlLabel,
   Grid,
   IconButton,
@@ -18,9 +20,11 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   ThemeProvider,
+  Tooltip,
   Typography,
-  createTheme
+  createTheme,
 } from '@mui/material';
 import React, { useState } from 'react';
 import { IStaffProps } from '../../Containers/state.interfaces';
@@ -29,10 +33,12 @@ import {
   Check as CheckIcon,
   Clear as ClearIcon,
   Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon
+  VisibilityOff as VisibilityOffIcon,
+  FilterAlt as FilterAltIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import './Staff.css';
+import PropTypes from 'prop-types';
 
 // declaring new color names
 declare module '@mui/material/styles' {
@@ -55,6 +61,18 @@ declare module '@mui/material/Switch' {
   }
 }
 
+declare module '@mui/material/Checkbox' {
+  interface CheckboxPropsColorOverrides {
+    button: true;
+  }
+}
+
+declare module '@mui/material/TextField' {
+  interface TextFieldPropsColorOverrides {
+    button: true;
+  }
+}
+
 // creating new colors
 const { palette } = createTheme();
 const { augmentColor } = palette;
@@ -67,10 +85,7 @@ const theme = createTheme({
 });
 
 const Staff = (props: IStaffProps): JSX.Element => {
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const menuOpen = Boolean(anchorEl);
-
-  const [validation, setValidation] = useState({
+  const [createValidation, setCreateValidation] = useState({
     email: '',
     name: '',
     isAdmin: false,
@@ -78,260 +93,610 @@ const Staff = (props: IStaffProps): JSX.Element => {
     position: '',
   });
 
+  const [adminValidation, setAdminValidation] = useState({
+    id: NaN,
+    name: '',
+    password: '',
+  });
+
+  const [deleteValidation, setDeleteValidation] = useState({
+    id: NaN,
+    name: '',
+  });
+
   const [showPassword, setShowPassword] = useState(false);
+  const [showDrawer, setShowDrawer] = useState(false);
 
-  const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleMenuClose = () => {
-    setAnchorEl(null);
+  const IsolatedMenu = (id: number, name: string, isAdmin: boolean) => {
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const menuOpen = Boolean(anchorEl);
+
+    const handleMenuClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+      setAnchorEl(event.currentTarget);
+    };
+
+    const handleMenuClose = () => {
+      setAnchorEl(null);
+    };
+
+    const handleEdit = () => {
+      handleMenuClose();
+    };
+
+    const handleDeleteClick = (id: number, name: string) => () => {
+      handleMenuClose();
+      handleClickDeleteDialogOpen(id, name);
+    };
+
+    const handleMakeAdminClick = (id: number, name: string) => () => {
+      handleMenuClose();
+      handleClickMakeAdminDialogOpen(id, name);
+    };
+
+    const handleRemoveAdminClick = (id: number, name: string) => () => {
+      handleMenuClose();
+      handleClickRemoveAdminDialogOpen(id, name);
+    };
+
+    return {
+      jsx:
+        <Menu
+          id="basic-menu"
+          anchorEl={anchorEl}
+          open={menuOpen}
+          onClose={handleMenuClose}
+          MenuListProps={{
+            'aria-labelledby': 'basic-button',
+          }}
+          disableScrollLock={true}
+        >
+          {isAdmin ?
+            <MenuItem onClick={handleRemoveAdminClick(id, name)}>
+              Забрати можливості адміністратора
+            </MenuItem>
+            :
+            <MenuItem onClick={handleMakeAdminClick(id, name)}>
+              Зробити адміністратором
+            </MenuItem>
+          }
+          <MenuItem onClick={handleEdit}>Редагувати</MenuItem>
+          <MenuItem onClick={handleDeleteClick(id, name)}>Видалити</MenuItem>
+        </Menu>,
+      handleMenuClick,
+    };
   };
 
-  const handleEdit = () => {
-    handleMenuClose();
+  const CreateDialog = () => {
+    return (
+      <Dialog
+        onClose={handleCreateDialogClose}
+        open={createDialogOpen}
+        className="dialog"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography align="center" fontSize={'20px'}>
+            Створити працівника
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <ValidatorForm onSubmit={handleCreateStaff} className="dialogContent">
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="Електронна пошта"
+              onChange={handleChangeCreateText}
+              name="email"
+              color="button"
+              value={email}
+              validators={['isEmail', 'required']}
+              errorMessages={[
+                'Це має бути електронна пошта',
+                "Це поле обов'язкове",
+              ]}
+              className="formElem"
+            />
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="Прізвище Ім'я Побатькові"
+              onChange={handleChangeCreateText}
+              name="name"
+              color="button"
+              value={name}
+              validators={['minStringLength:2']}
+              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
+              className="formElem"
+            />
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="Посада"
+              onChange={handleChangeCreateText}
+              name="position"
+              color="button"
+              value={position}
+              validators={['minStringLength:2']}
+              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
+              className="formElem"
+            />
+            <FormControlLabel
+              value={isAdmin}
+              onChange={handleChangeCreateText}
+              control={<Switch color="button" />}
+              label="Зробити адміністратором"
+              labelPlacement="end"
+              name="isAdmin"
+              className="formElem"
+            />
+            {isAdmin ?
+              <TextValidator
+                fullWidth
+                variant={'outlined'}
+                label="Пароль"
+                onChange={handleChangeCreateText}
+                name="password"
+                color="button"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                validators={['minStringLength:8']}
+                errorMessages={['Мінімальна довжина паролю - 8 символів']}
+                className="formElem"
+                InputProps={{
+                  // <-- This is where the toggle button is added.
+                  endAdornment:
+                    <InputAdornment position="end">
+                      <IconButton
+                        aria-label="toggle password visibility"
+                        onMouseDown={handleMouseSwitchShowPassword}
+                        onMouseUp={handleMouseSwitchShowPassword}
+                      >
+                        {showPassword ?
+                          <VisibilityIcon />
+                          :
+                          <VisibilityOffIcon />
+                        }
+                      </IconButton>
+                    </InputAdornment>
+                  ,
+                }}
+              />
+              :
+              ''
+            }
+            <Grid
+              container
+              justifyContent={'space-evenly'}
+              className="controllButtons"
+            >
+              <Button
+                color="error"
+                variant="contained"
+                onClick={handleCreateDialogClose}
+              >
+                Відмінити
+              </Button>
+              <Button type={'submit'} color="button" variant="contained">
+                Створити
+              </Button>
+            </Grid>
+          </ValidatorForm>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
-  const handleDelete = () => {
-    handleMenuClose();
+  const DeleteDialog = (deleteId: number, deleteName: string) => {
+    return (
+      <Dialog
+        onClose={handleDeleteDialogClose}
+        open={deleteDialogOpen}
+        className="dialog"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography align="center" fontSize={'20px'}>
+            {`Видалити працівника "${deleteName}" ?`}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Grid
+            container
+            justifyContent="space-evenly"
+            className="dialogContent"
+          >
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleDeleteDialogClose}
+            >
+              Відмінити
+            </Button>
+            <Button
+              variant="contained"
+              color="button"
+              onClick={handleDeleteStaff(deleteId)}
+            >
+              Видалити
+            </Button>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    );
   };
 
-  const handleMakeAdmin = () => {
-    handleMenuClose();
+  const RemoveAdminDialog = (adminId: number, adminName: string) => {
+    return (
+      <Dialog
+        onClose={handleRemoveAdminDialogClose}
+        open={removeAdminDialogOpen}
+        className="dialog"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography align="center" fontSize={'20px'}>
+            {`Забрати можливості адміністратора у працівника "${adminName}" ?`}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Grid
+            container
+            justifyContent="space-evenly"
+            className="dialogContent"
+          >
+            <Button
+              variant="contained"
+              color="error"
+              onClick={handleRemoveAdminDialogClose}
+            >
+              Відмінити
+            </Button>
+            <Button
+              variant="contained"
+              color="button"
+              onClick={handleRemoveAdmin(adminId)}
+            >
+              Забрати права адміністратора
+            </Button>
+          </Grid>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  const MakeAdminDialog = (id: number, name: string, password: string) => {
+    return (
+      <Dialog
+        onClose={handleMakeAdminDialogClose}
+        open={makeAdminDialogOpen}
+        className="dialog"
+        fullWidth
+      >
+        <DialogTitle>
+          <Typography align="center" fontSize={'20px'}>
+            {`Зробити працівника "${name}" адміністратором ?`}
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <ValidatorForm
+            onSubmit={handleMakeAdmin(id)}
+            className="dialogContent"
+          >
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="Пароль"
+              onChange={handleChangeAdminText}
+              name="password"
+              color="button"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              validators={['minStringLength:8']}
+              errorMessages={['Мінімальна довжина паролю - 8 символів']}
+              className="formElem"
+              InputProps={{
+                // <-- This is where the toggle button is added.
+                endAdornment:
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onMouseDown={handleMouseSwitchShowPassword}
+                      onMouseUp={handleMouseSwitchShowPassword}
+                    >
+                      {showPassword ?
+                        <VisibilityIcon />
+                        :
+                        <VisibilityOffIcon />
+                      }
+                    </IconButton>
+                  </InputAdornment>
+                ,
+              }}
+            />
+            <Grid
+              container
+              justifyContent="space-evenly"
+              className="dialogContent"
+            >
+              <Button
+                variant="contained"
+                color="error"
+                onClick={handleMakeAdminDialogClose}
+              >
+                Відмінити
+              </Button>
+              <Button variant="contained" color="button" type={'submit'}>
+                Зробити адміністратором
+              </Button>
+            </Grid>
+          </ValidatorForm>
+        </DialogContent>
+      </Dialog>
+    );
+  };
+
+  const handleMakeAdmin = (adminId: number) => () => {
+    handleMakeAdminDialogClose();
+  };
+
+  const handleRemoveAdmin = (adminId: number) => () => {
+    handleRemoveAdminDialogClose();
   };
 
   const handleMouseSwitchShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const handleDrawerOpenToggle = () => {
+    setShowDrawer(!showDrawer);
+  };
+
   const handleCreateStaff = () => {
-    setValidation({
+    handleCreateDialogClose();
+  };
+
+  const [createDialogOpen, setCreateOpen] = React.useState(false);
+  const [deleteDialogOpen, setDeleteOpen] = React.useState(false);
+  const [makeAdminDialogOpen, setMakeAdminOpen] = React.useState(false);
+  const [removeAdminDialogOpen, setRemoveAdminOpen] = React.useState(false);
+
+  const handleClickCreateDialogOpen = () => {
+    setCreateOpen(true);
+  };
+
+  const handleCreateDialogClose = () => {
+    setCreateOpen(false);
+    setCreateValidation({
       email: '',
       name: '',
       isAdmin: false,
       password: '',
       position: '',
     });
-    handleDialogClose();
   };
 
-  const [dialogOpen, setOpen] = React.useState(false);
-
-  const handleClickDialogOpen = () => {
-    setOpen(true);
+  const handleClickDeleteDialogOpen = (id: number, name: string) => {
+    setDeleteValidation({ id, name });
+    setDeleteOpen(true);
   };
 
-  const handleDialogClose = () => {
-    setValidation({
-      email: '',
-      name: '',
-      isAdmin: false,
-      password: '',
-      position: '',
-    });
-    setOpen(false);
+  const handleDeleteDialogClose = () => {
+    setDeleteOpen(false);
+    setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleChangeText = (event: any) => {
+  const handleDeleteStaff = (id: number) => () => {
+    handleDeleteDialogClose();
+  };
+
+  const handleClickMakeAdminDialogOpen = (id: number, name: string) => {
+    setAdminValidation({ id, name, password: '' });
+    setMakeAdminOpen(true);
+  };
+
+  const handleMakeAdminDialogClose = () => {
+    setMakeAdminOpen(false);
+    setAdminValidation({ id: NaN, name: '', password: '' });
+  };
+
+  const handleClickRemoveAdminDialogOpen = (id: number, name: string) => {
+    setAdminValidation({ id, name, password: '' });
+    setRemoveAdminOpen(true);
+  };
+
+  const handleRemoveAdminDialogClose = () => {
+    setRemoveAdminOpen(false);
+    setAdminValidation({ id: NaN, name: '', password: '' });
+  };
+
+  const handleChangeCreateText = (event: any) => {
     if (event.target.type === 'checkbox') {
-      setValidation({
-        ...validation,
+      setCreateValidation({
+        ...createValidation,
         [event.target.name]: event.target.checked,
-        password: event.target.checked ? validation.password : '',
+        password: event.target.checked ? createValidation.password : '',
       });
     } else {
-      setValidation({
-        ...validation,
+      setCreateValidation({
+        ...createValidation,
         [event.target.name]: event.target.value,
       });
     }
   };
 
-  const { email, isAdmin, name, password, position } = validation;
+  const handleChangeAdminText = (event: any) => {
+    if (event.target.type === 'checkbox') {
+      setAdminValidation({
+        ...adminValidation,
+        [event.target.name]: event.target.checked,
+        password: event.target.checked ? adminValidation.password : '',
+      });
+    } else {
+      setAdminValidation({
+        ...adminValidation,
+        [event.target.name]: event.target.value,
+      });
+    }
+  };
+
+  const { email, isAdmin, name, password, position } = createValidation;
+  const {
+    password: adminPassword,
+    id: adminId,
+    name: adminName,
+  } = adminValidation;
+  const { id: deleteId, name: deleteName } = deleteValidation;
 
   return (
     <TableContainer component={Paper}>
       <ThemeProvider theme={theme}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+        <Table>
           <TableHead>
             <TableRow>
               <TableCell align="center">Обліковий номер</TableCell>
               <TableCell align="center">Електронна пошта</TableCell>
               <TableCell align="center">ПІБ</TableCell>
+              <TableCell align="center">Посада</TableCell>
               <TableCell align="center">Чи є адміністратором</TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
               <TableCell align="center">Хто останній раз оновив</TableCell>
               <TableCell align="center">
-                <Button
-                  color="button"
-                  variant="contained"
-                  className="createButton"
-                  onClick={handleClickDialogOpen}
+                <Grid container justifyContent="space-between">
+                  <Button
+                    color="button"
+                    variant="contained"
+                    className="createButton"
+                    onClick={handleClickCreateDialogOpen}
+                  >
+                    <Typography variant="caption" fontWeight={'bold'}>
+                      Створити
+                    </Typography>
+                  </Button>
+                  <Tooltip title="Фільтрація">
+                    <span>
+                      <IconButton
+                        onClick={handleDrawerOpenToggle}
+                        aria-label="Фільтрація"
+                      >
+                        <FilterAltIcon />
+                      </IconButton>
+                    </span>
+                  </Tooltip>
+                </Grid>
+                <Drawer
+                  anchor="right"
+                  open={showDrawer}
+                  onClose={handleDrawerOpenToggle}
+                  PaperProps={{
+                    sx: { width: '20%' },
+                  }}
                 >
-                  <Typography variant="caption" fontWeight={'bold'}>
-                    Створити
-                  </Typography>
-                </Button>
+                  <Grid
+                    container
+                    direction="column"
+                    justifyContent="space-between"
+                    className="drawerContainer"
+                  >
+                    <div>
+                      <Typography
+                        variant="h5"
+                        align="center"
+                        className="drawerFilterTitle"
+                      >
+                        Фільтрація
+                      </Typography>
+                      <TextField
+                        fullWidth
+                        label="Обліковий номер"
+                        className="drawerFilterElem"
+                        color="button"
+                      />
+                      <TextField
+                        fullWidth
+                        label="ПІБ"
+                        className="drawerFilterElem"
+                        color="button"
+                      />
+                      <TextField
+                        fullWidth
+                        label="Посада"
+                        className="drawerFilterElem"
+                        color="button"
+                      />
+                      <TextField
+                        fullWidth
+                        label="Електронна пошта"
+                        className="drawerFilterElem"
+                        color="button"
+                      />
+                      <Typography>Чи є адміністратором ?</Typography>
+                      <FormControlLabel
+                        value={isAdmin}
+                        // onChange={handleChangeCreateText}
+                        control={<Checkbox color="button" />}
+                        label="Так"
+                        labelPlacement="end"
+                        name="isAdmin"
+                        className="formElem"
+                      />
+                      <FormControlLabel
+                        value={isAdmin}
+                        // onChange={handleChangeCreateText}
+                        control={<Checkbox color="button" />}
+                        label="Ні"
+                        labelPlacement="end"
+                        name="isAdmin"
+                        className="formElem"
+                      />
+                    </div>
+                    <Button color="button" variant="contained">
+                      Застосувати
+                    </Button>
+                  </Grid>
+                </Drawer>
               </TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {props.staff.map((staff) =>
-              <TableRow key={staff.id}>
-                <TableCell align="center">{staff.id}</TableCell>
-                <TableCell align="center">{staff.email}</TableCell>
-                <TableCell align="center">{staff.name}</TableCell>
-                <TableCell align="center">
-                  {staff.isAdmin ?
-                    <CheckIcon color="success" />
-                    :
-                    <ClearIcon color="error" />
-                  }
-                </TableCell>
-                <TableCell align="center">{staff.updatedAt}</TableCell>
-                <TableCell align="center">{staff.updatedBy}</TableCell>
-                <TableCell align="center">
-                  <IconButton onClick={handleMenuClick}>
-                    <MoreHorizIcon />
-                  </IconButton>
-                  <Menu
-                    id="basic-menu"
-                    anchorEl={anchorEl}
-                    open={menuOpen}
-                    onClose={handleMenuClose}
-                    MenuListProps={{
-                      'aria-labelledby': 'basic-button',
-                    }}
-                    disableScrollLock={true}
-                  >
-                    <MenuItem onClick={handleMakeAdmin}>
-                      Зробити адміністратором
-                    </MenuItem>
-                    <MenuItem onClick={handleEdit}>Редагувати</MenuItem>
-                    <MenuItem onClick={handleDelete}>Видалити</MenuItem>
-                  </Menu>
-                </TableCell>
-              </TableRow>
-            )}
+            {props.staff.map((staff) => {
+              const menu = IsolatedMenu(staff.id, staff.name, staff.isAdmin);
+              return (
+                <TableRow key={staff.id}>
+                  <TableCell align="center">{staff.id}</TableCell>
+                  <TableCell align="center">{staff.email}</TableCell>
+                  <TableCell align="center">{staff.name}</TableCell>
+                  <TableCell align="center">{staff.position}</TableCell>
+                  <TableCell align="center">
+                    {staff.isAdmin ?
+                      <CheckIcon color="success" />
+                      :
+                      <ClearIcon color="error" />
+                    }
+                  </TableCell>
+                  <TableCell align="center">{staff.updatedAt}</TableCell>
+                  <TableCell align="center">{staff.updatedBy}</TableCell>
+                  <TableCell align="center">
+                    <IconButton onClick={menu.handleMenuClick}>
+                      <MoreHorizIcon />
+                    </IconButton>
+                    {menu.jsx}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
-        <Dialog
-          onClose={handleDialogClose}
-          open={dialogOpen}
-          className="dialog"
-          fullWidth
-        >
-          <DialogTitle>
-            <Typography align="center" fontSize={'20px'}>
-              Створити працівника
-            </Typography>
-          </DialogTitle>
-          <DialogContent className="dialogContent">
-            <ValidatorForm onSubmit={handleCreateStaff}>
-              <TextValidator
-                fullWidth
-                variant={'outlined'}
-                label="Електронна пошта"
-                onChange={handleChangeText}
-                name="email"
-                color="button"
-                value={email}
-                validators={['isEmail', 'required']}
-                errorMessages={[
-                  'Це має бути електронна пошта',
-                  "Це поле обов'язкове",
-                ]}
-                className="formElem"
-              />
-              <TextValidator
-                fullWidth
-                variant={'outlined'}
-                label="Прізвище Ім'я Побатькові"
-                onChange={handleChangeText}
-                name="name"
-                color="button"
-                value={name}
-                validators={['minStringLength:2']}
-                errorMessages={['Мінімальна дозволена довжена - 2 символи']}
-                className="formElem"
-              />
-              <TextValidator
-                fullWidth
-                variant={'outlined'}
-                label="Посада"
-                onChange={handleChangeText}
-                name="position"
-                color="button"
-                value={position}
-                validators={['minStringLength:2']}
-                errorMessages={['Мінімальна дозволена довжена - 2 символи']}
-                className="formElem"
-              />
-              <FormControlLabel
-                value={isAdmin}
-                onChange={handleChangeText}
-                control={<Switch color="button" />}
-                label="Зробити адміністратором"
-                labelPlacement="end"
-                name="isAdmin"
-                className="formElem"
-              />
-              {isAdmin ?
-                <TextValidator
-                  fullWidth
-                  variant={'outlined'}
-                  label="Пароль"
-                  onChange={handleChangeText}
-                  name="password"
-                  color="button"
-                  type={showPassword ? 'text' : 'password'}
-                  value={password}
-                  validators={['minStringLength:8']}
-                  errorMessages={['Мінімальна довжина паролю - 8 символів']}
-                  className="formElem"
-                  InputProps={{
-                    // <-- This is where the toggle button is added.
-                    endAdornment:
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onMouseDown={handleMouseSwitchShowPassword}
-                          onMouseUp={handleMouseSwitchShowPassword}
-                        >
-                          {showPassword ?
-                            <VisibilityIcon />
-                            :
-                            <VisibilityOffIcon />
-                          }
-                        </IconButton>
-                      </InputAdornment>
-                    ,
-                  }}
-                />
-                :
-                ''
-              }
-              <Grid
-                container
-                justifyContent={'space-evenly'}
-                className="controllButtons"
-              >
-                <Button
-                  color="button"
-                  variant="contained"
-                  onClick={handleDialogClose}
-                >
-                  Відмінити
-                </Button>
-                <Button type={'submit'} color="button" variant="contained">
-                  Створити
-                </Button>
-              </Grid>
-            </ValidatorForm>
-          </DialogContent>
-        </Dialog>
+        {CreateDialog()}
+        {DeleteDialog(deleteId, deleteName)}
+        {MakeAdminDialog(adminId, adminName, adminPassword)}
+        {RemoveAdminDialog(adminId, adminName)}
       </ThemeProvider>
     </TableContainer>
   );
+};
+
+Staff.propTypes = {
+  staff: PropTypes.array,
 };
 
 export default Staff;

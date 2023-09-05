@@ -2,10 +2,19 @@ import { Grid, Paper, Typography } from '@mui/material';
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './SideBar.css';
+import {
+  Checkroom,
+  Hail,
+  LocalShipping,
+  Person,
+  ReceiptLong,
+  ShoppingCart,
+  Store,
+} from '@mui/icons-material';
 
 const SideBar = (): JSX.Element => {
   return (
-    <Paper elevation={5} className="sideBar">
+    <Paper elevation={15} className="sideBar">
       <Grid container>
         <NavLink
           to="/staff"
@@ -13,7 +22,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Працівники</Typography>
+          <Typography variant="h6" alignItems="end">
+            <Grid container alignItems="center">
+              <Hail />
+              Працівники
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/clients"
@@ -21,7 +35,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Клієнти</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <Person />
+              Клієнти
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/cloth"
@@ -29,7 +48,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Товари</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <Checkroom />
+              Товари
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/orders"
@@ -37,7 +61,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Замовлення</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <ShoppingCart />
+              Замовлення
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/stores"
@@ -45,7 +74,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Магазини</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <Store />
+              Магазини
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/delivery"
@@ -53,7 +87,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Поставки</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <LocalShipping />
+              Поставки
+            </Grid>
+          </Typography>
         </NavLink>
         <NavLink
           to="/reports"
@@ -61,7 +100,12 @@ const SideBar = (): JSX.Element => {
             isActive ? 'sideBarLink sideBarLinkActive' : 'sideBarLink'
           }
         >
-          <Typography variant="h6">Звіти</Typography>
+          <Typography variant="h6">
+            <Grid container alignItems="center">
+              <ReceiptLong />
+              Звіти
+            </Grid>
+          </Typography>
         </NavLink>
       </Grid>
     </Paper>
