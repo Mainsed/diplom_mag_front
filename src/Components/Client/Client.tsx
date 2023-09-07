@@ -1,19 +1,18 @@
 import {
   Button,
-  Checkbox,
   Dialog,
   DialogContent,
   DialogTitle,
   Drawer,
-  FormControlLabel,
+  FormControl,
   Grid,
   IconButton,
-  InputAdornment,
+  InputLabel,
   Menu,
   MenuItem,
   PaletteColorOptions,
   Paper,
-  Switch,
+  Select,
   Table,
   TableBody,
   TableCell,
@@ -30,20 +29,16 @@ import {
 import React, { useState, useEffect } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
-  Check as CheckIcon,
-  Clear as ClearIcon,
-  Visibility as VisibilityIcon,
-  VisibilityOff as VisibilityOffIcon,
   FilterAlt as FilterAltIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-import './Staff.css';
 import PropTypes from 'prop-types';
 import {
-  IStaff,
-  IStaffCreate,
-  IStaffProps,
-  IStaffUpdate,
+  ClothSizes,
+  IClient,
+  IClientCreate,
+  IClientProps,
+  IClientUpdate,
 } from '../../Redux/interfaces';
 
 // declaring new color names
@@ -61,14 +56,14 @@ declare module '@mui/material/Button' {
   }
 }
 
-declare module '@mui/material/Switch' {
-  interface SwitchPropsColorOverrides {
+declare module '@mui/material/InputBase' {
+  interface InputBasePropsColorOverrides {
     button: true;
   }
 }
 
-declare module '@mui/material/Checkbox' {
-  interface CheckboxPropsColorOverrides {
+declare module '@mui/material/FormLabel' {
+  interface FormLabelPropsColorOverrides {
     button: true;
   }
 }
@@ -90,44 +85,35 @@ const theme = createTheme({
   },
 });
 
-const Staff = (props: IStaffProps): JSX.Element => {
+const Client = (props: IClientProps): JSX.Element => {
   useEffect(() => {
-    props.getStaffThunk();
+    props.getClientThunk();
   }, []);
 
-  const staff = props.staff.staff || [];
-  const staffCount = props.staff.staffCount || 0;
+  const clients = props.client?.client || [];
+  const clientCount = props.client.clientCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
     email: '',
     name: '',
-    isAdmin: false,
-    password: '',
-    position: '',
+    phoneNumber: '',
+    size: '',
   });
 
   const [editValidation, setEditValidation] = useState({
     id: NaN,
     email: '',
     name: '',
-    isAdmin: false,
-    password: '',
-    position: '',
+    phoneNumber: '',
+    size: '',
   });
 
   const [filter, setFilter] = useState({
     id: '',
     email: '',
     name: '',
-    isAdmin: false,
-    isNotAdmin: false,
-    position: '',
-  });
-
-  const [adminValidation, setAdminValidation] = useState({
-    id: NaN,
-    name: '',
-    password: '',
+    phoneNumber: '',
+    size: '',
   });
 
   const [deleteValidation, setDeleteValidation] = useState({
@@ -135,7 +121,6 @@ const Staff = (props: IStaffProps): JSX.Element => {
     name: '',
   });
 
-  const [showPassword, setShowPassword] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -143,14 +128,12 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const [createDialogOpen, setCreateOpen] = React.useState(false);
   const [deleteDialogOpen, setDeleteOpen] = React.useState(false);
-  const [makeAdminDialogOpen, setMakeAdminOpen] = React.useState(false);
-  const [removeAdminDialogOpen, setRemoveAdminOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
   const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
 
-  const IsolatedMenu = (staff: IStaff) => {
+  const IsolatedMenu = (client: IClient) => {
     const menuOpen = Boolean(anchorEl);
-    const { id, name, isAdmin } = staff;
+    const { id, name } = client;
 
     const handleMenuClick =
       (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -163,9 +146,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
       setAnchorId(null);
     };
 
-    const handleEditClick = (staff: IStaff) => () => {
+    const handleEditClick = (client: IClient) => () => {
       handleMenuClose();
-      handleClickEditDialogOpen(staff);
+      handleClickEditDialogOpen(client);
     };
 
     const handleDeleteClick = (id: number, name: string) => () => {
@@ -173,38 +156,19 @@ const Staff = (props: IStaffProps): JSX.Element => {
       handleClickDeleteDialogOpen(id, name);
     };
 
-    const handleMakeAdminClick = (id: number, name: string) => () => {
-      handleMenuClose();
-      handleClickMakeAdminDialogOpen(id, name);
-    };
-
-    const handleRemoveAdminClick = (id: number, name: string) => () => {
-      handleMenuClose();
-      handleClickRemoveAdminDialogOpen(id, name);
-    };
-
     return {
       jsx: (
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
-          open={menuOpen && anchorId === staff.id}
+          open={menuOpen && anchorId === client.id}
           onClose={handleMenuClose}
           MenuListProps={{
             'aria-labelledby': 'basic-button',
           }}
           disableScrollLock={true}
         >
-          {isAdmin ? (
-            <MenuItem onClick={handleRemoveAdminClick(id, name)}>
-              Забрати можливості адміністратора
-            </MenuItem>
-          ) : (
-            <MenuItem onClick={handleMakeAdminClick(id, name)}>
-              Зробити адміністратором
-            </MenuItem>
-          )}
-          <MenuItem onClick={handleEditClick(staff)}>Редагувати</MenuItem>
+          <MenuItem onClick={handleEditClick(client)}>Редагувати</MenuItem>
           <MenuItem onClick={handleDeleteClick(id, name)}>Видалити</MenuItem>
         </Menu>
       ),
@@ -222,11 +186,14 @@ const Staff = (props: IStaffProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Створити працівника
+            Створити клієнта
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm onSubmit={handleCreateStaff} className="dialogContent">
+          <ValidatorForm
+            onSubmit={handleCreateClient}
+            className="dialogContent"
+          >
             <TextValidator
               fullWidth
               variant={'outlined'}
@@ -257,59 +224,36 @@ const Staff = (props: IStaffProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Посада"
+              label="Номер телефону"
               onChange={handleChangeCreateText}
-              name="position"
+              name="phoneNumber"
               color="button"
-              value={position}
+              value={phoneNumber}
               validators={['minStringLength:2']}
               errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
             />
-            <FormControlLabel
-              value={isAdmin}
-              onChange={handleChangeCreateText}
-              control={<Switch color="button" />}
-              label="Зробити адміністратором"
-              labelPlacement="end"
-              name="isAdmin"
-              className="formElem"
-            />
-            {isAdmin ? (
-              <TextValidator
-                fullWidth
-                variant={'outlined'}
-                label="Пароль"
-                onChange={handleChangeCreateText}
-                name="password"
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" color="button">
+                Розмір одягу
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={size}
+                label="Розмір одягу"
                 color="button"
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                validators={['minStringLength:8']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів']}
-                className="formElem"
-                InputProps={{
-                  // <-- This is where the toggle button is added.
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton
-                        aria-label="toggle password visibility"
-                        onMouseDown={handleMouseSwitchShowPassword}
-                        onMouseUp={handleMouseSwitchShowPassword}
-                      >
-                        {showPassword ? (
-                          <VisibilityIcon />
-                        ) : (
-                          <VisibilityOffIcon />
-                        )}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-            ) : (
-              ''
-            )}
+                name="size"
+                onChange={handleChangeCreateText}
+              >
+                <MenuItem value={ClothSizes.XS}>{ClothSizes.XS}</MenuItem>
+                <MenuItem value={ClothSizes.S}>{ClothSizes.S}</MenuItem>
+                <MenuItem value={ClothSizes.M}>{ClothSizes.M}</MenuItem>
+                <MenuItem value={ClothSizes.L}>{ClothSizes.L}</MenuItem>
+                <MenuItem value={ClothSizes.XL}>{ClothSizes.XL}</MenuItem>
+                <MenuItem value={ClothSizes.XXL}>{ClothSizes.XXL}</MenuItem>
+              </Select>
+            </FormControl>
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -342,16 +286,16 @@ const Staff = (props: IStaffProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Редагувати працівника
+            Редагувати клієнта
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm onSubmit={handleEditStaff} className="dialogContent">
+          <ValidatorForm onSubmit={handleEditClient} className="dialogContent">
             <TextValidator
               fullWidth
               variant={'outlined'}
               label="Електронна пошта"
-              onChange={handleEditAdminText}
+              onChange={handleChangeEditText}
               name="email"
               color="button"
               value={editEmail}
@@ -366,7 +310,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               fullWidth
               variant={'outlined'}
               label="Прізвище Ім'я Побатькові"
-              onChange={handleEditAdminText}
+              onChange={handleChangeEditText}
               name="name"
               color="button"
               value={editName}
@@ -377,41 +321,36 @@ const Staff = (props: IStaffProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Посада"
-              onChange={handleEditAdminText}
-              name="position"
+              label="Номер телефону"
+              onChange={handleChangeEditText}
+              name="phoneNumber"
               color="button"
-              value={editPosition}
+              value={editPhoneNumber}
               validators={['minStringLength:2']}
               errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
             />
-            <FormControlLabel
-              checked={editIsAdmin}
-              disabled={true}
-              control={<Switch color="button" />}
-              label="Зробити адміністратором"
-              labelPlacement="end"
-              name="isAdmin"
-              className="formElem"
-            />
-            {editIsAdmin ? (
-              <TextValidator
-                fullWidth
-                disabled={true}
-                variant={'outlined'}
-                label="Пароль"
-                name="password"
+            <FormControl fullWidth>
+              <InputLabel id="demo-simple-select-label" color="button">
+                Розмір одягу
+              </InputLabel>
+              <Select
+                labelId="demo-simple-select-label"
+                id="demo-simple-select"
+                value={editSize}
+                label="Розмір одягу"
                 color="button"
-                type={showPassword ? 'text' : 'password'}
-                value={editPassword}
-                validators={['minStringLength:8']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів']}
-                className="formElem"
-              />
-            ) : (
-              ''
-            )}
+                name="size"
+                onChange={handleChangeEditText}
+              >
+                <MenuItem value={ClothSizes.XS}>{ClothSizes.XS}</MenuItem>
+                <MenuItem value={ClothSizes.S}>{ClothSizes.S}</MenuItem>
+                <MenuItem value={ClothSizes.M}>{ClothSizes.M}</MenuItem>
+                <MenuItem value={ClothSizes.L}>{ClothSizes.L}</MenuItem>
+                <MenuItem value={ClothSizes.XL}>{ClothSizes.XL}</MenuItem>
+                <MenuItem value={ClothSizes.XXL}>{ClothSizes.XXL}</MenuItem>
+              </Select>
+            </FormControl>
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -444,7 +383,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            {`Видалити працівника "${deleteName}" ?`}
+            {`Видалити клієнта "${deleteName}" ?`}
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -463,7 +402,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
             <Button
               variant="contained"
               color="button"
-              onClick={handleDeleteStaff(deleteId)}
+              onClick={handleDeleteClient(deleteId)}
             >
               Видалити
             </Button>
@@ -473,170 +412,64 @@ const Staff = (props: IStaffProps): JSX.Element => {
     );
   };
 
-  const RemoveAdminDialog = (adminId: number, adminName: string) => {
-    return (
-      <Dialog
-        onClose={handleRemoveAdminDialogClose}
-        open={removeAdminDialogOpen}
-        className="dialog"
-        fullWidth
-      >
-        <DialogTitle>
-          <Typography align="center" fontSize={'20px'}>
-            {`Забрати можливості адміністратора у працівника "${adminName}" ?`}
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <Grid
-            container
-            justifyContent="space-evenly"
-            className="dialogContent"
-          >
-            <Button
-              variant="contained"
-              color="error"
-              onClick={handleRemoveAdminDialogClose}
-            >
-              Відмінити
-            </Button>
-            <Button
-              variant="contained"
-              color="button"
-              onClick={handleRemoveAdmin(adminId)}
-            >
-              Забрати права адміністратора
-            </Button>
-          </Grid>
-        </DialogContent>
-      </Dialog>
-    );
-  };
-
-  const MakeAdminDialog = (id: number, name: string, password: string) => {
-    return (
-      <Dialog
-        onClose={handleMakeAdminDialogClose}
-        open={makeAdminDialogOpen}
-        className="dialog"
-        fullWidth
-      >
-        <DialogTitle>
-          <Typography align="center" fontSize={'20px'}>
-            {`Зробити працівника "${name}" адміністратором ?`}
-          </Typography>
-        </DialogTitle>
-        <DialogContent>
-          <ValidatorForm
-            onSubmit={handleMakeAdmin(id)}
-            className="dialogContent"
-          >
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Пароль"
-              onChange={handleChangeAdminText}
-              name="password"
-              color="button"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              validators={['minStringLength:8']}
-              errorMessages={['Мінімальна довжина паролю - 8 символів']}
-              className="formElem"
-              InputProps={{
-                // <-- This is where the toggle button is added.
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <IconButton
-                      aria-label="toggle password visibility"
-                      onMouseDown={handleMouseSwitchShowPassword}
-                      onMouseUp={handleMouseSwitchShowPassword}
-                    >
-                      {showPassword ? (
-                        <VisibilityIcon />
-                      ) : (
-                        <VisibilityOffIcon />
-                      )}
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-            />
-            <Grid
-              container
-              justifyContent="space-evenly"
-              className="dialogContent"
-            >
-              <Button
-                variant="contained"
-                color="error"
-                onClick={handleMakeAdminDialogClose}
-              >
-                Відмінити
-              </Button>
-              <Button variant="contained" color="button" type={'submit'}>
-                Зробити адміністратором
-              </Button>
-            </Grid>
-          </ValidatorForm>
-        </DialogContent>
-      </Dialog>
-    );
-  };
-
-  const handleMakeAdmin = (adminId: number) => () => {
-    handleMakeAdminDialogClose();
-  };
-
-  const handleRemoveAdmin = (adminId: number) => () => {
-    handleRemoveAdminDialogClose();
-  };
-
-  const handleMouseSwitchShowPassword = () => {
-    setShowPassword(!showPassword);
-  };
-
   const handleDrawerOpenToggle = () => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateStaff = () => {
-    const createStaffData = {
+  const handleCreateClient = () => {
+    const createClientData = {
       email: createValidation.email,
-      isAdmin: createValidation.isAdmin,
       name: createValidation.name,
-      position: createValidation.position,
-      password: createValidation.password,
-    } as IStaffCreate;
+      phoneNumber: createValidation.phoneNumber,
+      size: createValidation.size,
+    } as IClientCreate;
 
-    props.createStaffThunk(createStaffData);
+    props.createClientThunk(createClientData);
+    props.getClientThunk({
+      limit: pagination.rows,
+      page: pagination.page,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        name: filter.name,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
+      },
+    });
     handleCreateDialogClose();
   };
 
-  const handleEditStaff = () => {
-    const staffChanged = staff.find((staff) => staff.id === editValidation.id);
+  const handleEditClient = () => {
+    const ClientChanged = clients.find(
+      (client) => client.id === editValidation.id,
+    );
 
-    if (!staffChanged) {
+    if (!ClientChanged) {
       handleEditDialogClose();
       return;
     }
 
-    const editStaffData = {
+    const editClientData = {
       id: editValidation.id,
       email:
-        editValidation.email !== staffChanged.email
+        editValidation.email !== ClientChanged.email
           ? editValidation.email
           : undefined,
       name:
-        editValidation.name !== staffChanged.name
+        editValidation.name !== ClientChanged.name
           ? editValidation.name
           : undefined,
-      position:
-        editValidation.position !== staffChanged.position
-          ? editValidation.position
+      phoneNumber:
+        editValidation.phoneNumber !== ClientChanged.phoneNumber
+          ? editValidation.phoneNumber
           : undefined,
-    } as IStaffUpdate;
+      size:
+        editValidation.size !== ClientChanged.size
+          ? editValidation.size
+          : undefined,
+    } as IClientUpdate;
 
-    props.updateStaffThunk(editStaffData);
+    props.updateClientThunk(editClientData);
     handleEditDialogClose();
   };
 
@@ -649,20 +482,18 @@ const Staff = (props: IStaffProps): JSX.Element => {
     setCreateValidation({
       email: '',
       name: '',
-      isAdmin: false,
-      password: '',
-      position: '',
+      phoneNumber: '',
+      size: '',
     });
   };
 
-  const handleClickEditDialogOpen = (staff: IStaff) => {
+  const handleClickEditDialogOpen = (client: IClient) => {
     setEditValidation({
-      id: staff.id,
-      email: staff.email,
-      name: staff.name,
-      isAdmin: staff.isAdmin,
-      password: staff.password,
-      position: staff.position,
+      id: client.id,
+      email: client.email,
+      name: client.name,
+      phoneNumber: client.phoneNumber,
+      size: client.size,
     });
     setEditOpen(true);
   };
@@ -673,9 +504,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
       id: NaN,
       email: '',
       name: '',
-      isAdmin: false,
-      password: '',
-      position: '',
+      phoneNumber: '',
+      size: '',
     });
   };
 
@@ -689,62 +519,30 @@ const Staff = (props: IStaffProps): JSX.Element => {
     setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleDeleteStaff = (id: number) => () => {
-    props.deleteStaffThunk({ id });
+  const handleDeleteClient = (id: number) => () => {
+    props.deleteClientThunk({ id });
+    props.getClientThunk({
+      limit: pagination.rows,
+      page: pagination.page,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        name: filter.name,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
+      },
+    });
     handleDeleteDialogClose();
   };
 
-  const handleClickMakeAdminDialogOpen = (id: number, name: string) => {
-    setAdminValidation({ id, name, password: '' });
-    setMakeAdminOpen(true);
-  };
-
-  const handleMakeAdminDialogClose = () => {
-    setMakeAdminOpen(false);
-    setAdminValidation({ id: NaN, name: '', password: '' });
-  };
-
-  const handleClickRemoveAdminDialogOpen = (id: number, name: string) => {
-    setAdminValidation({ id, name, password: '' });
-    setRemoveAdminOpen(true);
-  };
-
-  const handleRemoveAdminDialogClose = () => {
-    setRemoveAdminOpen(false);
-    setAdminValidation({ id: NaN, name: '', password: '' });
-  };
-
   const handleChangeCreateText = (event: any) => {
-    if (event.target.type === 'checkbox') {
-      setCreateValidation({
-        ...createValidation,
-        [event.target.name]: event.target.checked,
-        password: event.target.checked ? createValidation.password : '',
-      });
-    } else {
-      setCreateValidation({
-        ...createValidation,
-        [event.target.name]: event.target.value,
-      });
-    }
+    setCreateValidation({
+      ...createValidation,
+      [event.target.name]: event.target.value,
+    });
   };
 
-  const handleChangeAdminText = (event: any) => {
-    if (event.target.type === 'checkbox') {
-      setAdminValidation({
-        ...adminValidation,
-        [event.target.name]: event.target.checked,
-        password: event.target.checked ? adminValidation.password : '',
-      });
-    } else {
-      setAdminValidation({
-        ...adminValidation,
-        [event.target.name]: event.target.value,
-      });
-    }
-  };
-
-  const handleEditAdminText = (event: any) => {
+  const handleChangeEditText = (event: any) => {
     setEditValidation({
       ...editValidation,
       [event.target.name]: event.target.value,
@@ -752,17 +550,10 @@ const Staff = (props: IStaffProps): JSX.Element => {
   };
 
   const handleChangeFilterText = (event: any) => {
-    if (event.target.type === 'checkbox') {
-      setFilter({
-        ...filter,
-        [event.target.name]: event.target.checked,
-      });
-    } else {
-      setFilter({
-        ...filter,
-        [event.target.name]: event.target.value,
-      });
-    }
+    setFilter({
+      ...filter,
+      [event.target.name]: event.target.value,
+    });
   };
 
   const handleChangePage = (
@@ -770,71 +561,69 @@ const Staff = (props: IStaffProps): JSX.Element => {
     newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
-    props.getStaffThunk({ limit: pagination.rows, page: newPage });
+    props.getClientThunk({
+      limit: pagination.rows,
+      page: newPage,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        name: filter.name,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
+      },
+    });
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
-    props.getStaffThunk({ limit: parseInt(event.target.value, 10), page: 0 });
+
+    props.getClientThunk({
+      limit: parseInt(event.target.value, 10),
+      page: 0,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        name: filter.name,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
+      },
+    });
   };
 
-  const handleFilterStaff = () => {
+  const handleFilterClient = () => {
     setPagination({ ...pagination, page: 0 });
-    let { isAdmin } = filter;
 
-    if (
-      (filter.isAdmin && filter.isNotAdmin) ||
-      (!filter.isAdmin && !filter.isNotAdmin)
-    ) {
-      isAdmin = undefined as any;
-    }
-
-    setFilter({
-      id: '',
-      email: '',
-      name: '',
-      isAdmin: false,
-      isNotAdmin: false,
-      position: '',
-    });
-
-    props.getStaffThunk({
+    props.getClientThunk({
       limit: pagination.rows,
       page: 0,
       filter: {
         id: parseInt(filter.id),
         email: filter.email,
-        isAdmin,
         name: filter.name,
-        position: filter.position,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
       },
     });
   };
 
-  const { email, isAdmin, name, password, position } = createValidation;
-  const {
-    password: adminPassword,
-    id: adminId,
-    name: adminName,
-  } = adminValidation;
+  const { email, name, phoneNumber, size } = createValidation;
+
   const { id: deleteId, name: deleteName } = deleteValidation;
   const {
     email: editEmail,
-    isAdmin: editIsAdmin,
     name: editName,
-    password: editPassword,
-    position: editPosition,
+    phoneNumber: editPhoneNumber,
+    size: editSize,
   } = editValidation;
 
   const {
     id: filterId,
     email: filterEmail,
-    isAdmin: filterIsAdmin,
-    isNotAdmin: filterIsNotAdmin,
     name: filterName,
-    position: filterPosition,
+    phoneNumber: filterPhoneNumber,
+    size: filterSize,
   } = filter;
 
   return (
@@ -846,8 +635,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
               <TableCell align="center">Обліковий номер</TableCell>
               <TableCell align="center">Електронна пошта</TableCell>
               <TableCell align="center">ПІБ</TableCell>
-              <TableCell align="center">Посада</TableCell>
-              <TableCell align="center">Чи є адміністратором</TableCell>
+              <TableCell align="center">Номер телефону</TableCell>
+              <TableCell align="center">Розмір одягу</TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
               <TableCell align="center">Хто останній раз оновив</TableCell>
               <TableCell align="center">
@@ -915,11 +704,11 @@ const Staff = (props: IStaffProps): JSX.Element => {
                       />
                       <TextField
                         fullWidth
-                        label="Посада"
+                        label="Номер телефону"
                         className="drawerFilterElem"
-                        value={filterPosition}
+                        value={filterPhoneNumber}
                         onChange={handleChangeFilterText}
-                        name="position"
+                        name="phoneNumber"
                         color="button"
                       />
                       <TextField
@@ -931,32 +720,47 @@ const Staff = (props: IStaffProps): JSX.Element => {
                         name="email"
                         color="button"
                       />
-                      <Typography>Чи є адміністратором ?</Typography>
-                      <FormControlLabel
-                        value={isAdmin}
-                        onChange={handleChangeFilterText}
-                        control={<Checkbox color="button" />}
-                        label="Так"
-                        labelPlacement="end"
-                        name="isAdmin"
-                        checked={filterIsAdmin}
-                        className="formElem"
-                      />
-                      <FormControlLabel
-                        value={isAdmin}
-                        onChange={handleChangeFilterText}
-                        control={<Checkbox color="button" />}
-                        label="Ні"
-                        labelPlacement="end"
-                        name="isNotAdmin"
-                        checked={filterIsNotAdmin}
-                        className="formElem"
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          id="demo-simple-select-label"
+                          color="button"
+                        >
+                          Розмір одягу
+                        </InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={filterSize}
+                          label="Розмір одягу"
+                          color="button"
+                          name="size"
+                          onChange={handleChangeFilterText}
+                        >
+                          <MenuItem value={ClothSizes.XS}>
+                            {ClothSizes.XS}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.S}>
+                            {ClothSizes.S}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.M}>
+                            {ClothSizes.M}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.L}>
+                            {ClothSizes.L}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.XL}>
+                            {ClothSizes.XL}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.XXL}>
+                            {ClothSizes.XXL}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                     <Button
                       color="button"
                       variant="contained"
-                      onClick={handleFilterStaff}
+                      onClick={handleFilterClient}
                     >
                       Застосувати
                     </Button>
@@ -966,25 +770,19 @@ const Staff = (props: IStaffProps): JSX.Element => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {staff?.map((staff) => {
-              const menu = IsolatedMenu(staff);
+            {clients?.map((client) => {
+              const menu = IsolatedMenu(client);
               return (
-                <TableRow key={staff.id}>
-                  <TableCell align="center">{staff.id}</TableCell>
-                  <TableCell align="center">{staff.email}</TableCell>
-                  <TableCell align="center">{staff.name}</TableCell>
-                  <TableCell align="center">{staff.position}</TableCell>
+                <TableRow key={client.id}>
+                  <TableCell align="center">{client.id}</TableCell>
+                  <TableCell align="center">{client.email}</TableCell>
+                  <TableCell align="center">{client.name}</TableCell>
+                  <TableCell align="center">{client.phoneNumber}</TableCell>
+                  <TableCell align="center">{client.size}</TableCell>
+                  <TableCell align="center">{client.updatedAt}</TableCell>
+                  <TableCell align="center">{client.updatedBy}</TableCell>
                   <TableCell align="center">
-                    {staff.isAdmin ? (
-                      <CheckIcon color="success" />
-                    ) : (
-                      <ClearIcon color="error" />
-                    )}
-                  </TableCell>
-                  <TableCell align="center">{staff.updatedAt}</TableCell>
-                  <TableCell align="center">{staff.updatedBy}</TableCell>
-                  <TableCell align="center">
-                    <IconButton onClick={menu.handleMenuClick(staff.id)}>
+                    <IconButton onClick={menu.handleMenuClick(client.id)}>
                       <MoreHorizIcon />
                     </IconButton>
                     {menu.jsx}
@@ -997,11 +795,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
         {CreateDialog()}
         {EditDialog()}
         {DeleteDialog(deleteId, deleteName)}
-        {MakeAdminDialog(adminId, adminName, adminPassword)}
-        {RemoveAdminDialog(adminId, adminName)}
         <TablePagination
           component="div"
-          count={staffCount || 0}
+          count={clientCount || 0}
           page={pagination.page}
           onPageChange={handleChangePage}
           rowsPerPage={pagination.rows}
@@ -1012,8 +808,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
   );
 };
 
-Staff.propTypes = {
-  staff: PropTypes.array,
+Client.propTypes = {
+  client: PropTypes.array,
 };
 
-export default Staff;
+export default Client;

@@ -4,11 +4,10 @@ import './App.css';
 import HeaderContainer from './Containers/HeaderContainer';
 import SideBarContainer from './Containers/SideBarContainer';
 import MainContentContainer from './Containers/MainContentContainer';
-import FooterContainer from './Containers/FooterContainer';
 
 const App = () => {
   return (
-    <Grid container className="app">
+    <Grid container className="app" justifyContent={'stretch'}>
       <HeaderContainer />
       <Grid container className="mainElem">
         <Grid item xs={4} sm={2.5} lg={1.3}>
@@ -17,9 +16,6 @@ const App = () => {
         <Grid item xs={8} sm={9.5} lg={10.7}>
           <MainContentContainer />
         </Grid>
-      </Grid>
-      <Grid className="appElem">
-        <FooterContainer />
       </Grid>
     </Grid>
   );

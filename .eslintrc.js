@@ -56,7 +56,6 @@ module.exports = {
     'no-duplicate-case': 'warn',
     'no-empty': 'warn',
     'no-extra-semi': 'warn',
-    'no-extra-parens': ['warn', 'all'],
     'no-extra-boolean-cast': 'warn',
     'no-func-assign': 'warn',
     'no-inner-declarations': 'warn',
