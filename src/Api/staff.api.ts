@@ -164,7 +164,7 @@ export const StaffApi = {
       },
     ] as IStaff[];
 
-    const startIndex = (staffData?.page || 0) * (staffData?.limit || 10)
+    const startIndex = (staffData?.page || 0) * (staffData?.limit || 10);
     const resp = staff.slice(startIndex, startIndex + (staffData?.limit || 10));
     return { staff: resp, staffCount: 12 };
   },
@@ -187,12 +187,12 @@ export const StaffApi = {
 
   updateStaff: (staffData: IStaffUpdate): Promise<IStaff> | IStaff => {
     throw Error('Not implemented');
-    return instance.put('staff', staffData)
+    return instance.put('staff', staffData);
   },
 
   deleteStaff: (staffData: IStaffDelete): Promise<number> | number => {
     // throw Error('Not implemented');
     // return instance.delete(`staff/${staffData.id}}`)
     return staffData.id;
-  }
-}
+  },
+};

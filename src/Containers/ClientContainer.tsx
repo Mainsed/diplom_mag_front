@@ -15,7 +15,6 @@ const ClientContainer = (props: any) => {
 };
 
 const mapStateToProps = (state: IState): Partial<IClientProps> => {
-  console.log(state)
   return {
     client: state.client,
   };

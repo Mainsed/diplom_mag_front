@@ -25,8 +25,8 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
 
     case DELETE_STAFF: {
       const newState = { ...state };
-      const newStaff = newState.staff.filter((staff) => staff.id !== action.data)
-      return { ...newState, staff: newStaff};
+      const newStaff = newState.staff.filter((staff) => staff.id !== action.data);
+      return { ...newState, staff: newStaff };
     }
 
     case UPDATE_STAFF: {

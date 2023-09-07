@@ -26,7 +26,7 @@ const clientReducer = (state = initialState, action: ActionTypes): IClientState 
     case DELETE_CLIENT: {
       const newState = { ...state };
       const newClient = newState.client.filter((client) => client.id !== action.data);
-      return { ...newState, client: newClient};
+      return { ...newState, client: newClient };
     }
 
     case UPDATE_CLIENT: {

@@ -441,7 +441,7 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleEditClient = () => {
     const ClientChanged = clients.find(
-      (client) => client.id === editValidation.id,
+      (client) => client.id === editValidation.id
     );
 
     if (!ClientChanged) {
@@ -558,7 +558,7 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     props.getClientThunk({
@@ -575,7 +575,7 @@ const Client = (props: IClientProps): JSX.Element => {
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 

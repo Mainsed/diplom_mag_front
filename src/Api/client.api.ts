@@ -11,7 +11,6 @@ import { instance } from './axios.instance';
 
 export const ClientApi = {
   getAlClient: (clientData: IClientGet): Promise<IClientState> | IClientState => {
-    console.log(clientData)
     // throw Error('Not implemented');
     // return instance.get('')
     const client = [
@@ -183,7 +182,7 @@ export const ClientApi = {
 
   updateClient: (clientData: IClientUpdate): Promise<IClient> | IClient => {
     throw Error('Not implemented');
-    return instance.put('client', clientData)
+    return instance.put('client', clientData);
   },
 
   deleteClient: (clientData: IClientDelete): Promise<number> | number => {
