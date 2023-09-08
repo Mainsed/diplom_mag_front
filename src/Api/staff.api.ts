@@ -228,7 +228,7 @@ export const StaffApi = {
         staff = updatedStaff;
       }
       return staff;
-    })
+    });
     return updatedStaff;
   },
 

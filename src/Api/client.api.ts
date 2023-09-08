@@ -171,7 +171,7 @@ export const ClientApi = {
         } else {
           return a[property] < b[property] ? 1 : -1;
         }
-      })
+      });
     }
 
     const resp = (clientSorted.length === client.length ? clientSorted : client)
@@ -211,7 +211,7 @@ export const ClientApi = {
       updatedAt: 'date',
       updatedBy: 'id',
       phoneNumber: clientData.phoneNumber || existingClient.phoneNumber,
-      size: clientData.size || existingClient.size
+      size: clientData.size || existingClient.size,
     } as IClient;
 
     client = client.map((client) => {
@@ -219,7 +219,7 @@ export const ClientApi = {
         client = updatedClient;
       }
       return client;
-    })
+    });
     return updatedClient;
   },
 
