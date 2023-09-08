@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Dialog,
   DialogContent,
@@ -20,6 +21,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   TextField,
   ThemeProvider,
   Tooltip,
@@ -40,6 +42,7 @@ import {
   IClientProps,
   IClientUpdate,
 } from '../../Redux/interfaces';
+import { EnumSort } from '../../enums/enum.sort';
 
 // declaring new color names
 declare module '@mui/material/styles' {
@@ -130,6 +133,9 @@ const Client = (props: IClientProps): JSX.Element => {
   const [deleteDialogOpen, setDeleteOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
   const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
+
+  const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
+  const [orderBy, setOrderBy] = React.useState('id');
 
   const IsolatedMenu = (client: IClient) => {
     const menuOpen = Boolean(anchorEl);
@@ -412,6 +418,29 @@ const Client = (props: IClientProps): JSX.Element => {
     );
   };
 
+  const updateClientList = (
+    rows: number,
+    page: number,
+    orderString = order,
+    orderByString = orderBy,
+  ) => {
+    props.getClientThunk({
+      limit: rows,
+      page: page,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        name: filter.name,
+        phoneNumber: filter.phoneNumber,
+        size: filter.size as ClothSizes,
+      },
+      sort: {
+        order: orderString,
+        orderBy: orderByString,
+      },
+    });
+  };
+
   const handleDrawerOpenToggle = () => {
     setShowDrawer(!showDrawer);
   };
@@ -425,23 +454,13 @@ const Client = (props: IClientProps): JSX.Element => {
     } as IClientCreate;
 
     props.createClientThunk(createClientData);
-    props.getClientThunk({
-      limit: pagination.rows,
-      page: pagination.page,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
-      },
-    });
+    updateClientList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
   const handleEditClient = () => {
     const ClientChanged = clients.find(
-      (client) => client.id === editValidation.id
+      (client) => client.id === editValidation.id,
     );
 
     if (!ClientChanged) {
@@ -470,6 +489,7 @@ const Client = (props: IClientProps): JSX.Element => {
     } as IClientUpdate;
 
     props.updateClientThunk(editClientData);
+    updateClientList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
 
@@ -521,17 +541,7 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleDeleteClient = (id: number) => () => {
     props.deleteClientThunk({ id });
-    props.getClientThunk({
-      limit: pagination.rows,
-      page: pagination.page,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
-      },
-    });
+    updateClientList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
 
@@ -558,54 +568,33 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
-    props.getClientThunk({
-      limit: pagination.rows,
-      page: newPage,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
-      },
-    });
+    updateClientList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
-    props.getClientThunk({
-      limit: parseInt(event.target.value, 10),
-      page: 0,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
-      },
-    });
+    updateClientList(parseInt(event.target.value, 10), 0);
   };
 
   const handleFilterClient = () => {
     setPagination({ ...pagination, page: 0 });
 
-    props.getClientThunk({
-      limit: pagination.rows,
-      page: 0,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
-      },
-    });
+    updateClientList(pagination.rows, 0);
+  };
+
+  const handleSort = (property: string) => () => {
+    const orderString =
+      orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
+    setOrder(orderString);
+    setOrderBy(property);
+    setPagination({ rows: pagination.rows, page: 0 });
+    updateClientList(pagination.rows, 0, orderString, property);
   };
 
   const { email, name, phoneNumber, size } = createValidation;
@@ -632,9 +621,33 @@ const Client = (props: IClientProps): JSX.Element => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Обліковий номер</TableCell>
-              <TableCell align="center">Електронна пошта</TableCell>
-              <TableCell align="center">ПІБ</TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'id'}
+                  direction={orderBy === 'id' ? order : 'asc'}
+                  onClick={handleSort('id')}
+                >
+                  Обліковий номер
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'email'}
+                  direction={orderBy === 'email' ? order : 'asc'}
+                  onClick={handleSort('email')}
+                >
+                  Електронна пошта
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={handleSort('name')}
+                >
+                  ПІБ
+                </TableSortLabel>
+              </TableCell>
               <TableCell align="center">Номер телефону</TableCell>
               <TableCell align="center">Розмір одягу</TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>

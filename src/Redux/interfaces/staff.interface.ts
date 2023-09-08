@@ -1,3 +1,5 @@
+import { EnumSort } from '../../enums/enum.sort';
+
 export interface IStaff {
   id: number;
   name: string;
@@ -54,8 +56,14 @@ export interface IStaffGetFilter {
   isAdmin?: boolean;
 }
 
+export interface IStaffGetSort {
+  order?: EnumSort;
+  orderBy?: string;
+}
+
 export interface IStaffGet {
   limit?: number;
   page?: number;
-  filter?: IStaffGetFilter
+  filter?: IStaffGetFilter,
+  sort?: IStaffGetSort
 }

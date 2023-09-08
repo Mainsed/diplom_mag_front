@@ -21,6 +21,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TableSortLabel,
   TextField,
   ThemeProvider,
   Tooltip,
@@ -45,6 +46,7 @@ import {
   IStaffProps,
   IStaffUpdate,
 } from '../../Redux/interfaces';
+import { EnumSort } from '../../enums/enum.sort';
 
 // declaring new color names
 declare module '@mui/material/styles' {
@@ -147,6 +149,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
   const [removeAdminDialogOpen, setRemoveAdminOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
   const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
+
+  const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
+  const [orderBy, setOrderBy] = React.useState('id');
 
   const IsolatedMenu = (staff: IStaff) => {
     const menuOpen = Boolean(anchorEl);
@@ -583,11 +588,51 @@ const Staff = (props: IStaffProps): JSX.Element => {
     );
   };
 
+  const updateStaffList = (
+    rows: number,
+    page: number,
+    orderString = order,
+    orderByString = orderBy,
+  ) => {
+    let { isAdmin } = filter;
+
+    if (
+      (filter.isAdmin && filter.isNotAdmin) ||
+      (!filter.isAdmin && !filter.isNotAdmin)
+    ) {
+      isAdmin = undefined as any;
+    }
+
+    props.getStaffThunk({
+      limit: rows,
+      page: page,
+      filter: {
+        id: parseInt(filter.id),
+        email: filter.email,
+        isAdmin,
+        name: filter.name,
+        position: filter.position,
+      },
+      sort: {
+        order: orderString,
+        orderBy: orderByString,
+      },
+    });
+  };
+
   const handleMakeAdmin = (adminId: number) => () => {
+    props.updateStaffThunk({
+      id: adminId,
+      isAdmin: true,
+      password: adminValidation.password,
+    });
+    updateStaffList(pagination.rows, pagination.page);
     handleMakeAdminDialogClose();
   };
 
   const handleRemoveAdmin = (adminId: number) => () => {
+    props.updateStaffThunk({ id: adminId, isAdmin: false });
+    updateStaffList(pagination.rows, pagination.page);
     handleRemoveAdminDialogClose();
   };
 
@@ -609,6 +654,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     } as IStaffCreate;
 
     props.createStaffThunk(createStaffData);
+    updateStaffList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
@@ -691,6 +737,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleDeleteStaff = (id: number) => () => {
     props.deleteStaffThunk({ id });
+    updateStaffList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
 
@@ -767,50 +814,32 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
-    props.getStaffThunk({ limit: pagination.rows, page: newPage });
+    updateStaffList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
-    props.getStaffThunk({ limit: parseInt(event.target.value, 10), page: 0 });
+    updateStaffList(parseInt(event.target.value, 10), 0);
   };
 
   const handleFilterStaff = () => {
     setPagination({ ...pagination, page: 0 });
-    let { isAdmin } = filter;
+    updateStaffList(pagination.rows, 0);
+    handleDrawerOpenToggle();
+  };
 
-    if (
-      (filter.isAdmin && filter.isNotAdmin) ||
-      (!filter.isAdmin && !filter.isNotAdmin)
-    ) {
-      isAdmin = undefined as any;
-    }
-
-    setFilter({
-      id: '',
-      email: '',
-      name: '',
-      isAdmin: false,
-      isNotAdmin: false,
-      position: '',
-    });
-
-    props.getStaffThunk({
-      limit: pagination.rows,
-      page: 0,
-      filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        isAdmin,
-        name: filter.name,
-        position: filter.position,
-      },
-    });
+  const handleSort = (property: string) => () => {
+    const orderString =
+      orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
+    setOrder(orderString);
+    setOrderBy(property);
+    setPagination({ rows: pagination.rows, page: 0 });
+    updateStaffList(pagination.rows, 0, orderString, property);
   };
 
   const { email, isAdmin, name, password, position } = createValidation;
@@ -843,11 +872,43 @@ const Staff = (props: IStaffProps): JSX.Element => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell align="center">Обліковий номер</TableCell>
-              <TableCell align="center">Електронна пошта</TableCell>
-              <TableCell align="center">ПІБ</TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'id'}
+                  direction={orderBy === 'id' ? order : 'asc'}
+                  onClick={handleSort('id')}
+                >
+                  Обліковий номер
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'email'}
+                  direction={orderBy === 'email' ? order : 'asc'}
+                  onClick={handleSort('email')}
+                >
+                  Електронна пошта
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={handleSort('name')}
+                >
+                  ПІБ
+                </TableSortLabel>
+              </TableCell>
               <TableCell align="center">Посада</TableCell>
-              <TableCell align="center">Чи є адміністратором</TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'isAdmin'}
+                  direction={orderBy === 'isAdmin' ? order : 'asc'}
+                  onClick={handleSort('isAdmin')}
+                >
+                  Чи є адміністратором
+                </TableSortLabel>
+              </TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
               <TableCell align="center">Хто останній раз оновив</TableCell>
               <TableCell align="center">

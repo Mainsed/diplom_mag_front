@@ -17,12 +17,6 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
       return action.data;
     }
 
-    case CREATE_STAFF: {
-      const newState = { ...state };
-      newState.staff.push(action.data);
-      return newState;
-    }
-
     case DELETE_STAFF: {
       const newState = { ...state };
       const newStaff = newState.staff.filter((staff) => staff.id !== action.data);
@@ -69,10 +63,6 @@ export const getStaff = (staffList: IStaff[], staffCount: number): GetStaffActio
   return { type: GET_STAFF, data: { staff: staffList, staffCount } };
 };
 
-export const createStaff = (staffToCreate: IStaff): CreateStaffActionType => {
-  return { type: CREATE_STAFF, data: staffToCreate };
-};
-
 export const updateStaff = (staffToUpdate: IStaff): UpdateStaffActionType => {
   return { type: UPDATE_STAFF, data: staffToUpdate };
 };
@@ -89,9 +79,7 @@ export const getStaffThunk = (staffData: IStaffGet) => async (dispatch: Dispatch
 };
 
 export const createStaffThunk = (staffToCreate: IStaffCreate) => async (dispatch: Dispatch<ActionTypes>) => {
-  const staff = await StaffApi.createStaff(staffToCreate);
-
-  dispatch({ type: CREATE_STAFF, data: staff });
+  await StaffApi.createStaff(staffToCreate);
 };
 
 export const updateStaffThunk = (staffToUpdate: IStaffUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
