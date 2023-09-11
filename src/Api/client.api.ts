@@ -7,7 +7,7 @@ import {
   IClientState,
   IClientUpdate,
 } from '../Redux/interfaces';
-import { EnumSort } from '../enums/enum.sort';
+import { EnumSort } from '../utils/enums/enum.sort';
 import { instance } from './axios.instance';
 
 let client = [
@@ -158,7 +158,7 @@ let client = [
 ] as IClient[];
 
 export const ClientApi = {
-  getAlClient: (clientData: IClientGet): Promise<IClientState> | IClientState => {
+  getAllClient: (clientData: IClientGet): Promise<IClientState> | IClientState => {
     const startIndex = (clientData?.page || 0) * (clientData?.limit || 10);
 
     let clientSorted = [] as IClient[];

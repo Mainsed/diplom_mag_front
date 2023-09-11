@@ -1,6 +1,6 @@
 import { instance } from './axios.instance';
 import { IStaff, IStaffCreate, IStaffDelete, IStaffGet, IStaffState, IStaffUpdate } from '../Redux/interfaces';
-import { EnumSort } from '../enums/enum.sort';
+import { EnumSort } from '../utils/enums/enum.sort';
 
 let staff = [
   {
@@ -162,7 +162,7 @@ let staff = [
 ] as IStaff[];
 
 export const StaffApi = {
-  getAlStaff: (staffData: IStaffGet): Promise<IStaffState> | IStaffState => {
+  getAllStaff: (staffData: IStaffGet): Promise<IStaffState> | IStaffState => {
     const startIndex = (staffData?.page || 0) * (staffData?.limit || 10);
 
     let staffSorted = [] as IStaff[];

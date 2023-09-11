@@ -46,7 +46,7 @@ import {
   IStaffProps,
   IStaffUpdate,
 } from '../../Redux/interfaces';
-import { EnumSort } from '../../enums/enum.sort';
+import { EnumSort } from '../../utils/enums/enum.sort';
 
 // declaring new color names
 declare module '@mui/material/styles' {

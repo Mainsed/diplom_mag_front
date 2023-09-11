@@ -58,22 +58,9 @@ type DeleteStaffActionType = {
   data: number
 }
 
-// actions
-export const getStaff = (staffList: IStaff[], staffCount: number): GetStaffActionType => {
-  return { type: GET_STAFF, data: { staff: staffList, staffCount } };
-};
-
-export const updateStaff = (staffToUpdate: IStaff): UpdateStaffActionType => {
-  return { type: UPDATE_STAFF, data: staffToUpdate };
-};
-
-export const deleteStaff = (staffToDelete: number): DeleteStaffActionType => {
-  return { type: DELETE_STAFF, data: staffToDelete };
-};
-
 // thunks
 export const getStaffThunk = (staffData: IStaffGet) => async (dispatch: Dispatch<ActionTypes>) => {
-  const staffResp = await StaffApi.getAlStaff(staffData);
+  const staffResp = await StaffApi.getAllStaff(staffData);
 
   dispatch({ type: GET_STAFF, data: staffResp });
 };

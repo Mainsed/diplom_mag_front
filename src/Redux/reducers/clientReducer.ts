@@ -64,26 +64,9 @@ type DeleteClientActionType = {
   data: number
 }
 
-// actions
-export const getClient = (clientList: IClient[], clientCount: number): GetClientActionType => {
-  return { type: GET_CLIENT, data: { client: clientList, clientCount } };
-};
-
-export const createClient = (clientToCreate: IClient): CreateClientActionType => {
-  return { type: CREATE_CLIENT, data: clientToCreate };
-};
-
-export const updateClient = (clientToUpdate: IClient): UpdateClientActionType => {
-  return { type: UPDATE_CLIENT, data: clientToUpdate };
-};
-
-export const deleteClient = (clientToDelete: number): DeleteClientActionType => {
-  return { type: DELETE_CLIENT, data: clientToDelete };
-};
-
 // thunks
 export const getClientThunk = (clientData: IClientGet) => async (dispatch: Dispatch<ActionTypes>) => {
-  const clientResp = await ClientApi.getAlClient(clientData);
+  const clientResp = await ClientApi.getAllClient(clientData);
 
   dispatch({ type: GET_CLIENT, data: clientResp });
 };

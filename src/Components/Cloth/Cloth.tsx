@@ -1,5 +1,7 @@
 import {
+  Box,
   Button,
+  Collapse,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -27,21 +29,24 @@ import {
   Typography,
   createTheme,
 } from '@mui/material';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
   FilterAlt as FilterAltIcon,
+  KeyboardArrowUp as KeyboardArrowUpIcon,
+  KeyboardArrowDown as KeyboardArrowDownIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import PropTypes from 'prop-types';
 import {
   ClothSizes,
-  IClient,
-  IClientCreate,
-  IClientProps,
-  IClientUpdate,
+  ICloth,
+  IClothCreate,
+  IClothProps,
+  IClothUpdate,
 } from '../../Redux/interfaces';
 import { EnumSort } from '../../utils/enums/enum.sort';
+import './Cloth.css';
 
 // declaring new color names
 declare module '@mui/material/styles' {
@@ -87,35 +92,35 @@ const theme = createTheme({
   },
 });
 
-const Client = (props: IClientProps): JSX.Element => {
+const Cloth = (props: IClothProps): JSX.Element => {
   useEffect(() => {
-    props.getClientThunk();
+    props.getClothThunk();
   }, []);
 
-  const clients = props.client?.client || [];
-  const clientCount = props.client.clientCount || 0;
+  const cloths = props.cloth?.cloth || [];
+  const clothCount = props.cloth.clothCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
-    email: '',
+    desc: '',
     name: '',
-    phoneNumber: '',
-    size: '',
+    price: '',
+    availableSizes: [] as ClothSizes[],
   });
 
   const [editValidation, setEditValidation] = useState({
     id: NaN,
-    email: '',
+    desc: '',
     name: '',
-    phoneNumber: '',
-    size: '',
+    price: '',
+    availableSizes: [] as ClothSizes[],
   });
 
   const [filter, setFilter] = useState({
     id: '',
-    email: '',
+    availableSizes: [] as ClothSizes[],
     name: '',
-    phoneNumber: '',
-    size: '',
+    desc: '',
+    price: '',
   });
 
   const [deleteValidation, setDeleteValidation] = useState({
@@ -132,13 +137,14 @@ const Client = (props: IClientProps): JSX.Element => {
   const [deleteDialogOpen, setDeleteOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
   const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
+  const [colapseOpen, setColapseOpen] = React.useState([] as number[]);
 
   const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
   const [orderBy, setOrderBy] = React.useState('id');
 
-  const IsolatedMenu = (client: IClient) => {
+  const IsolatedMenu = (cloth: ICloth) => {
     const menuOpen = Boolean(anchorEl);
-    const { id, name } = client;
+    const { id, name } = cloth;
 
     const handleMenuClick =
       (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -151,9 +157,9 @@ const Client = (props: IClientProps): JSX.Element => {
       setAnchorId(null);
     };
 
-    const handleEditClick = (client: IClient) => () => {
+    const handleEditClick = (cloth: ICloth) => () => {
       handleMenuClose();
-      handleClickEditDialogOpen(client);
+      handleClickEditDialogOpen(cloth);
     };
 
     const handleDeleteClick = (id: number, name: string) => () => {
@@ -166,14 +172,15 @@ const Client = (props: IClientProps): JSX.Element => {
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
-          open={menuOpen && anchorId === client.id}
+          open={menuOpen && anchorId === cloth.id}
           onClose={handleMenuClose}
           MenuListProps={{
             'aria-labelledby': 'basic-button',
           }}
           disableScrollLock={true}
+          key={cloth.id}
         >
-          <MenuItem onClick={handleEditClick(client)}>Редагувати</MenuItem>
+          <MenuItem onClick={handleEditClick(cloth)}>Редагувати</MenuItem>
           <MenuItem onClick={handleDeleteClick(id, name)}>Видалити</MenuItem>
         </Menu>
       ),
@@ -191,25 +198,22 @@ const Client = (props: IClientProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Створити клієнта
+            Створити товар
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm
-            onSubmit={handleCreateClient}
-            className="dialogContent"
-          >
+          <ValidatorForm onSubmit={handleCreateCloth} className="dialogContent">
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Електронна пошта"
+              label="Назва"
               onChange={handleChangeCreateText}
-              name="email"
+              name="name"
               color="button"
-              value={email}
-              validators={['isEmail', 'required']}
+              value={name}
+              validators={['minStringLength:2', 'required']}
               errorMessages={[
-                'Це має бути електронна пошта',
+                'Мінімальна дозволена довжена - 2 символи',
                 "Це поле обов'язкове",
               ]}
               className="formElem"
@@ -217,11 +221,11 @@ const Client = (props: IClientProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Прізвище Ім'я Побатькові"
+              label="Опис товару"
               onChange={handleChangeCreateText}
-              name="name"
+              name="desc"
               color="button"
-              value={name}
+              value={desc}
               validators={['minStringLength:2']}
               errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
@@ -229,34 +233,35 @@ const Client = (props: IClientProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Номер телефону"
+              label="Ціна"
               onChange={handleChangeCreateText}
-              name="phoneNumber"
+              name="price"
               color="button"
-              value={phoneNumber}
-              validators={['minStringLength:2']}
-              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
+              value={price}
+              validators={['required']}
+              errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
-            <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label" color="button">
-                Розмір одягу
+            <FormControl fullWidth className="formElem">
+              <InputLabel id="select-label" color="button">
+                Розміри
               </InputLabel>
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={size}
-                label="Розмір одягу"
-                color="button"
-                name="size"
+                labelId="select-label"
+                multiple
+                fullWidth
+                variant={'outlined'}
+                label="Розміри"
                 onChange={handleChangeCreateText}
+                name="availableSizes"
+                color="button"
+                value={availableSizes}
               >
-                <MenuItem value={ClothSizes.XS}>{ClothSizes.XS}</MenuItem>
-                <MenuItem value={ClothSizes.S}>{ClothSizes.S}</MenuItem>
-                <MenuItem value={ClothSizes.M}>{ClothSizes.M}</MenuItem>
-                <MenuItem value={ClothSizes.L}>{ClothSizes.L}</MenuItem>
-                <MenuItem value={ClothSizes.XL}>{ClothSizes.XL}</MenuItem>
-                <MenuItem value={ClothSizes.XXL}>{ClothSizes.XXL}</MenuItem>
+                {Object.values(ClothSizes).map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <Grid
@@ -291,30 +296,15 @@ const Client = (props: IClientProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Редагувати клієнта
+            Редагувати товар
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm onSubmit={handleEditClient} className="dialogContent">
+          <ValidatorForm onSubmit={handleEditCloth} className="dialogContent">
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Електронна пошта"
-              onChange={handleChangeEditText}
-              name="email"
-              color="button"
-              value={editEmail}
-              validators={['isEmail', 'required']}
-              errorMessages={[
-                'Це має бути електронна пошта',
-                "Це поле обов'язкове",
-              ]}
-              className="formElem"
-            />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Прізвище Ім'я Побатькові"
+              label="Назва"
               onChange={handleChangeEditText}
               name="name"
               color="button"
@@ -326,36 +316,51 @@ const Client = (props: IClientProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Номер телефону"
+              label="Опис"
               onChange={handleChangeEditText}
-              name="phoneNumber"
+              name="desc"
               color="button"
-              value={editPhoneNumber}
-              validators={['minStringLength:2']}
-              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
+              value={editDesc}
+              validators={['required']}
+              errorMessages={["Це поле обов'язкове"]}
+              className="formElem"
+            />
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="Ціна"
+              onChange={handleChangeEditText}
+              name="price"
+              color="button"
+              value={editPrice}
+              validators={['required']}
+              errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
             <FormControl fullWidth>
-              <InputLabel id="demo-simple-select-label" color="button">
-                Розмір одягу
+              <InputLabel id="select-label" color="button">
+                Розміри
               </InputLabel>
               <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={editSize}
-                label="Розмір одягу"
-                color="button"
-                name="size"
+                labelId="select-label"
+                multiple
+                fullWidth
+                variant={'outlined'}
+                label="Ціна"
                 onChange={handleChangeEditText}
+                name="availableSizes"
+                color="button"
+                value={editAvailableSizes}
+                className="formElem"
               >
-                <MenuItem value={ClothSizes.XS}>{ClothSizes.XS}</MenuItem>
-                <MenuItem value={ClothSizes.S}>{ClothSizes.S}</MenuItem>
-                <MenuItem value={ClothSizes.M}>{ClothSizes.M}</MenuItem>
-                <MenuItem value={ClothSizes.L}>{ClothSizes.L}</MenuItem>
-                <MenuItem value={ClothSizes.XL}>{ClothSizes.XL}</MenuItem>
-                <MenuItem value={ClothSizes.XXL}>{ClothSizes.XXL}</MenuItem>
+                {Object.values(ClothSizes).map((name) => (
+                  <MenuItem key={name} value={name}>
+                    {name}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
+
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -388,7 +393,7 @@ const Client = (props: IClientProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            {`Видалити клієнта "${deleteName}" ?`}
+            {`Видалити товар '${deleteName}' ?`}
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -407,7 +412,7 @@ const Client = (props: IClientProps): JSX.Element => {
             <Button
               variant="contained"
               color="button"
-              onClick={handleDeleteClient(deleteId)}
+              onClick={handleDeleteCloth(deleteId)}
             >
               Видалити
             </Button>
@@ -417,21 +422,30 @@ const Client = (props: IClientProps): JSX.Element => {
     );
   };
 
-  const updateClientList = (
+  const handleColapseToggle = (clothId: number) => () => {
+    if (colapseOpen.indexOf(clothId) !== -1) {
+      setColapseOpen(colapseOpen.filter((colapse) => colapse !== clothId));
+    } else {
+      props.getClothSizesThunk(clothId);
+      setColapseOpen([...colapseOpen, clothId]);
+    }
+  };
+
+  const updateClothList = (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
-    props.getClientThunk({
+    props.getClothThunk({
       limit: rows,
       page: page,
       filter: {
         id: parseInt(filter.id),
-        email: filter.email,
+        availableSizes: filter.availableSizes as ClothSizes[],
         name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
+        desc: filter.desc,
+        price: parseInt(filter.price),
       },
       sort: {
         order: orderString,
@@ -444,51 +458,49 @@ const Client = (props: IClientProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateClient = () => {
-    const createClientData = {
-      email: createValidation.email,
+  const handleCreateCloth = () => {
+    const createClothData = {
+      desc: createValidation.desc,
       name: createValidation.name,
-      phoneNumber: createValidation.phoneNumber,
-      size: createValidation.size,
-    } as IClientCreate;
+      price: parseInt(createValidation.price),
+      availableSizes: createValidation.availableSizes,
+    } as IClothCreate;
 
-    props.createClientThunk(createClientData);
-    updateClientList(pagination.rows, pagination.page);
+    props.createClothThunk(createClothData);
+    updateClothList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
-  const handleEditClient = () => {
-    const ClientChanged = clients.find(
-      (client) => client.id === editValidation.id
-    );
+  const handleEditCloth = () => {
+    const ClothChanged = cloths.find((cloth) => cloth.id === editValidation.id);
 
-    if (!ClientChanged) {
+    if (!ClothChanged) {
       handleEditDialogClose();
       return;
     }
 
-    const editClientData = {
+    const editClothData = {
       id: editValidation.id,
-      email:
-        editValidation.email !== ClientChanged.email
-          ? editValidation.email
+      desc:
+        editValidation.desc !== ClothChanged.desc
+          ? editValidation.desc
           : undefined,
       name:
-        editValidation.name !== ClientChanged.name
+        editValidation.name !== ClothChanged.name
           ? editValidation.name
           : undefined,
-      phoneNumber:
-        editValidation.phoneNumber !== ClientChanged.phoneNumber
-          ? editValidation.phoneNumber
+      price:
+        parseInt(editValidation.price) !== ClothChanged.price
+          ? parseInt(editValidation.price)
           : undefined,
-      size:
-        editValidation.size !== ClientChanged.size
-          ? editValidation.size
+      availableSizes:
+        editValidation.availableSizes !== ClothChanged.availableSizes
+          ? editValidation.availableSizes
           : undefined,
-    } as IClientUpdate;
+    } as IClothUpdate;
 
-    props.updateClientThunk(editClientData);
-    updateClientList(pagination.rows, pagination.page);
+    props.updateClothThunk(editClothData);
+    updateClothList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
 
@@ -499,20 +511,20 @@ const Client = (props: IClientProps): JSX.Element => {
   const handleCreateDialogClose = () => {
     setCreateOpen(false);
     setCreateValidation({
-      email: '',
+      desc: '',
       name: '',
-      phoneNumber: '',
-      size: '',
+      price: '',
+      availableSizes: [],
     });
   };
 
-  const handleClickEditDialogOpen = (client: IClient) => {
+  const handleClickEditDialogOpen = (cloth: ICloth) => {
     setEditValidation({
-      id: client.id,
-      email: client.email,
-      name: client.name,
-      phoneNumber: client.phoneNumber,
-      size: client.size,
+      id: cloth.id,
+      desc: cloth.desc,
+      name: cloth.name,
+      price: cloth.price.toString(),
+      availableSizes: cloth.availableSizes,
     });
     setEditOpen(true);
   };
@@ -521,10 +533,10 @@ const Client = (props: IClientProps): JSX.Element => {
     setEditOpen(false);
     setEditValidation({
       id: NaN,
-      email: '',
+      desc: '',
       name: '',
-      phoneNumber: '',
-      size: '',
+      price: '',
+      availableSizes: [],
     });
   };
 
@@ -538,13 +550,14 @@ const Client = (props: IClientProps): JSX.Element => {
     setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleDeleteClient = (id: number) => () => {
-    props.deleteClientThunk({ id });
-    updateClientList(pagination.rows, pagination.page);
+  const handleDeleteCloth = (id: number) => () => {
+    props.deleteClothThunk({ id });
+    updateClothList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
 
   const handleChangeCreateText = (event: any) => {
+    console.log(event.target.name, event.target.value);
     setCreateValidation({
       ...createValidation,
       [event.target.name]: event.target.value,
@@ -567,24 +580,24 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
-    updateClientList(pagination.rows, newPage);
+    updateClothList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
-    updateClientList(parseInt(event.target.value, 10), 0);
+    updateClothList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterClient = () => {
+  const handleFilterCloth = () => {
     setPagination({ ...pagination, page: 0 });
-
-    updateClientList(pagination.rows, 0);
+    handleDrawerOpenToggle();
+    updateClothList(pagination.rows, 0);
   };
 
   const handleSort = (property: string) => () => {
@@ -593,25 +606,25 @@ const Client = (props: IClientProps): JSX.Element => {
     setOrder(orderString);
     setOrderBy(property);
     setPagination({ rows: pagination.rows, page: 0 });
-    updateClientList(pagination.rows, 0, orderString, property);
+    updateClothList(pagination.rows, 0, orderString, property);
   };
 
-  const { email, name, phoneNumber, size } = createValidation;
+  const { desc, name, price, availableSizes } = createValidation;
 
   const { id: deleteId, name: deleteName } = deleteValidation;
   const {
-    email: editEmail,
+    desc: editDesc,
     name: editName,
-    phoneNumber: editPhoneNumber,
-    size: editSize,
+    price: editPrice,
+    availableSizes: editAvailableSizes,
   } = editValidation;
 
   const {
     id: filterId,
-    email: filterEmail,
+    desc: filterDesc,
     name: filterName,
-    phoneNumber: filterPhoneNumber,
-    size: filterSize,
+    price: filterPrice,
+    availableSizes: filterAvailableSizes,
   } = filter;
 
   return (
@@ -620,6 +633,7 @@ const Client = (props: IClientProps): JSX.Element => {
         <Table>
           <TableHead>
             <TableRow>
+              <TableCell align="center" />
               <TableCell align="center">
                 <TableSortLabel
                   active={orderBy === 'id'}
@@ -631,24 +645,24 @@ const Client = (props: IClientProps): JSX.Element => {
               </TableCell>
               <TableCell align="center">
                 <TableSortLabel
-                  active={orderBy === 'email'}
-                  direction={orderBy === 'email' ? order : 'asc'}
-                  onClick={handleSort('email')}
-                >
-                  Електронна пошта
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
                   active={orderBy === 'name'}
                   direction={orderBy === 'name' ? order : 'asc'}
                   onClick={handleSort('name')}
                 >
-                  ПІБ
+                  Назва
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">Номер телефону</TableCell>
-              <TableCell align="center">Розмір одягу</TableCell>
+              <TableCell align="center">Опис</TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'price'}
+                  direction={orderBy === 'price' ? order : 'asc'}
+                  onClick={handleSort('price')}
+                >
+                  Ціна
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">Доступні розміри</TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
               <TableCell align="center">Хто останній раз оновив</TableCell>
               <TableCell align="center">
@@ -716,63 +730,50 @@ const Client = (props: IClientProps): JSX.Element => {
                       />
                       <TextField
                         fullWidth
-                        label="Номер телефону"
+                        label="Опис"
                         className="drawerFilterElem"
-                        value={filterPhoneNumber}
+                        value={filterDesc}
                         onChange={handleChangeFilterText}
-                        name="phoneNumber"
+                        name="desc"
                         color="button"
                       />
                       <TextField
                         fullWidth
-                        label="Електронна пошта"
+                        label="Ціна"
                         className="drawerFilterElem"
-                        value={filterEmail}
+                        value={filterPrice}
                         onChange={handleChangeFilterText}
-                        name="email"
+                        name="price"
                         color="button"
                       />
                       <FormControl fullWidth>
-                        <InputLabel
-                          id="demo-simple-select-label"
-                          color="button"
-                        >
-                          Розмір одягу
+                        <InputLabel id="select-label" color="button">
+                          Розміри
                         </InputLabel>
                         <Select
-                          labelId="demo-simple-select-label"
-                          id="demo-simple-select"
-                          value={filterSize}
-                          label="Розмір одягу"
-                          color="button"
-                          name="size"
+                          labelId="select-label"
+                          multiple
+                          fullWidth
+                          variant={'outlined'}
+                          label="Розміри"
                           onChange={handleChangeFilterText}
+                          name="availableSizes"
+                          color="button"
+                          value={filterAvailableSizes}
+                          className="drawerFilterElem"
                         >
-                          <MenuItem value={ClothSizes.XS}>
-                            {ClothSizes.XS}
-                          </MenuItem>
-                          <MenuItem value={ClothSizes.S}>
-                            {ClothSizes.S}
-                          </MenuItem>
-                          <MenuItem value={ClothSizes.M}>
-                            {ClothSizes.M}
-                          </MenuItem>
-                          <MenuItem value={ClothSizes.L}>
-                            {ClothSizes.L}
-                          </MenuItem>
-                          <MenuItem value={ClothSizes.XL}>
-                            {ClothSizes.XL}
-                          </MenuItem>
-                          <MenuItem value={ClothSizes.XXL}>
-                            {ClothSizes.XXL}
-                          </MenuItem>
+                          {Object.values(ClothSizes).map((name) => (
+                            <MenuItem key={name} value={name}>
+                              {name}
+                            </MenuItem>
+                          ))}
                         </Select>
                       </FormControl>
                     </div>
                     <Button
                       color="button"
                       variant="contained"
-                      onClick={handleFilterClient}
+                      onClick={handleFilterCloth}
                     >
                       Застосувати
                     </Button>
@@ -782,24 +783,74 @@ const Client = (props: IClientProps): JSX.Element => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {clients?.map((client) => {
-              const menu = IsolatedMenu(client);
+            {cloths?.map((cloth) => {
+              const menu = IsolatedMenu(cloth);
               return (
-                <TableRow key={client.id}>
-                  <TableCell align="center">{client.id}</TableCell>
-                  <TableCell align="center">{client.email}</TableCell>
-                  <TableCell align="center">{client.name}</TableCell>
-                  <TableCell align="center">{client.phoneNumber}</TableCell>
-                  <TableCell align="center">{client.size}</TableCell>
-                  <TableCell align="center">{client.updatedAt}</TableCell>
-                  <TableCell align="center">{client.updatedBy}</TableCell>
-                  <TableCell align="center">
-                    <IconButton onClick={menu.handleMenuClick(client.id)}>
-                      <MoreHorizIcon />
-                    </IconButton>
-                    {menu.jsx}
-                  </TableCell>
-                </TableRow>
+                <>
+                  <TableRow>
+                    <TableCell align="center">
+                      <IconButton
+                        size="small"
+                        onClick={handleColapseToggle(cloth.id)}
+                      >
+                        {colapseOpen.includes(cloth.id) ? (
+                          <KeyboardArrowUpIcon />
+                        ) : (
+                          <KeyboardArrowDownIcon />
+                        )}
+                      </IconButton>
+                    </TableCell>
+                    <TableCell align="center">{cloth.id}</TableCell>
+                    <TableCell align="center">{cloth.name}</TableCell>
+                    <TableCell align="center">{cloth.desc}</TableCell>
+                    <TableCell align="center">{cloth.price}</TableCell>
+                    <TableCell align="center">
+                      {cloth.availableSizes.map((size) => (
+                        <span key={size} className="sizeSpan">
+                          {size}
+                        </span>
+                      ))}
+                    </TableCell>
+                    <TableCell align="center">{cloth.updatedAt}</TableCell>
+                    <TableCell align="center">{cloth.updatedBy}</TableCell>
+                    <TableCell align="center">
+                      <IconButton onClick={menu.handleMenuClick(cloth.id)}>
+                        <MoreHorizIcon />
+                      </IconButton>
+                      {menu.jsx}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    <TableCell
+                      style={{ paddingBottom: 0, paddingTop: 0 }}
+                      colSpan={12}
+                    >
+                      <Collapse
+                        in={colapseOpen.includes(cloth.id)}
+                        timeout="auto"
+                        unmountOnExit
+                      >
+                        <Box sx={{ margin: 1 }}>
+                          {props.cloth?.sizesByShop
+                            ?.find(
+                              (clothByShops) =>
+                                clothByShops.clothId === cloth.id,
+                            )
+                            ?.shops.map((shop, i) => (
+                              <div key={i}>
+                                {shop.shopId}
+                                {shop.sizes.map((size) => (
+                                  <span key={size.size + shop.shopId}>
+                                    {size.size}:{size.count}
+                                  </span>
+                                ))}
+                              </div>
+                            ))}
+                        </Box>
+                      </Collapse>
+                    </TableCell>
+                  </TableRow>
+                </>
               );
             })}
           </TableBody>
@@ -809,7 +860,7 @@ const Client = (props: IClientProps): JSX.Element => {
         {DeleteDialog(deleteId, deleteName)}
         <TablePagination
           component="div"
-          count={clientCount || 0}
+          count={clothCount || 0}
           page={pagination.page}
           onPageChange={handleChangePage}
           rowsPerPage={pagination.rows}
@@ -820,8 +871,9 @@ const Client = (props: IClientProps): JSX.Element => {
   );
 };
 
-Client.propTypes = {
-  client: PropTypes.array,
+Cloth.propTypes = {
+  cloth: PropTypes.any,
+  getClothSizesThunk: PropTypes.any,
 };
 
-export default Client;
+export default Cloth;

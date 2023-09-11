@@ -1,4 +1,4 @@
-import { EnumSort } from '../../enums/enum.sort';
+import { IGetSort } from '../../utils/interfaces/get.sort.interface';
 
 export enum ClothSizes {
   XS = 'XS',
@@ -62,14 +62,9 @@ export interface IClientGetFilter {
   size?: ClothSizes;
 }
 
-export interface IClientGetSort {
-  order?: EnumSort;
-  orderBy?: string;
-}
-
 export interface IClientGet {
   limit?: number;
   page?: number;
   filter?: IClientGetFilter,
-  sort?: IClientGetSort
+  sort?: IGetSort
 }
