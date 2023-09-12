@@ -1,6 +1,19 @@
 .sizeSpan {
-  background-color: #78C091;
+  background-color: #78c091;
   padding: 5px;
   margin: 2px;
   border-radius: 5px;
+}
+
+.shopSizes {
+  background-color: #78c091 !important;
+  padding: 20px;
+  margin-bottom: 15px !important;
+  margin-top: 10px !important;
+  width: fit-content;
+}
+
+.shopSizesWrap {
+  margin-bottom: 10px !important;
+  margin-top: 10px !important;
 }

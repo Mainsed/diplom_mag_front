@@ -4,10 +4,9 @@ import {
   IClothCreate,
   IClothDelete,
   IClothGet,
-  IClothSizeInShop,
   IClothSizeInShops,
   IClothState,
-  IClothUpdate
+  IClothUpdate,
 } from '../interfaces';
 import { ClothApi } from '../../Api/cloth.api';
 
@@ -35,7 +34,7 @@ const clothReducer = (state = initialState, action: ActionTypes): IClothState =>
     case GET_CLOTH_SIZES: {
       const clothIndex = state.sizesByShop?.findIndex((sizeByShop) => sizeByShop.clothId === action.data.clothId);
       let newSizesByShop = state.sizesByShop || [];
-      console.log(action.data, clothIndex)
+      console.log(action.data, clothIndex);
       if (clothIndex && clothIndex !== -1) {
         newSizesByShop = newSizesByShop?.map((sizeByShop) => {
           if (sizeByShop.clothId === action.data.clothId) {
@@ -46,7 +45,7 @@ const clothReducer = (state = initialState, action: ActionTypes): IClothState =>
       } else {
         newSizesByShop.push(action.data);
       }
-      console.log(newSizesByShop)
+      console.log(newSizesByShop);
       return { ...state, sizesByShop: newSizesByShop };
     }
 

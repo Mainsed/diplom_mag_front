@@ -1,5 +1,4 @@
 import {
-  Box,
   Button,
   Collapse,
   Dialog,
@@ -29,7 +28,7 @@ import {
   Typography,
   createTheme,
 } from '@mui/material';
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
   FilterAlt as FilterAltIcon,
@@ -435,7 +434,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     props.getClothThunk({
       limit: rows,
@@ -580,14 +579,14 @@ const Cloth = (props: IClothProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateClothList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -786,7 +785,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
             {cloths?.map((cloth) => {
               const menu = IsolatedMenu(cloth);
               return (
-                <>
+                <React.Fragment key={'tab' + cloth.id}>
                   <TableRow>
                     <TableCell align="center">
                       <IconButton
@@ -830,27 +829,40 @@ const Cloth = (props: IClothProps): JSX.Element => {
                         timeout="auto"
                         unmountOnExit
                       >
-                        <Box sx={{ margin: 1 }}>
-                          {props.cloth?.sizesByShop
-                            ?.find(
-                              (clothByShops) =>
-                                clothByShops.clothId === cloth.id,
-                            )
-                            ?.shops.map((shop, i) => (
-                              <div key={i}>
-                                {shop.shopId}
-                                {shop.sizes.map((size) => (
-                                  <span key={size.size + shop.shopId}>
-                                    {size.size}:{size.count}
-                                  </span>
-                                ))}
-                              </div>
-                            ))}
-                        </Box>
+                        <Paper className="shopSizesWrap" elevation={3}>
+                          <Typography align="center">
+                            Кількість товару в магазинах
+                          </Typography>
+                          <Grid container>
+                            {props.cloth?.sizesByShop
+                              ?.find(
+                                (clothByShops) =>
+                                  clothByShops.clothId === cloth.id
+                              )
+                              ?.shops.map((shop, i) => (
+                                <Grid item xs={6} md={4} lg={3} key={i}>
+                                  <Grid container justifyContent="center">
+                                    <Paper className="shopSizes" elevation={3}>
+                                      <Typography align="center">
+                                        Номер магазину: {shop.shopId}
+                                      </Typography>
+                                      {shop.sizes.map((size) => (
+                                        <Grid key={size.size + shop.shopId}>
+                                          <Typography align="center">
+                                            {size.size}: {size.count} шт.
+                                          </Typography>
+                                        </Grid>
+                                      ))}
+                                    </Paper>
+                                  </Grid>
+                                </Grid>
+                              ))}
+                          </Grid>
+                        </Paper>
                       </Collapse>
                     </TableCell>
                   </TableRow>
-                </>
+                </React.Fragment>
               );
             })}
           </TableBody>
