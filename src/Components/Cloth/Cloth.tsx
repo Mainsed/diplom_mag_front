@@ -556,7 +556,6 @@ const Cloth = (props: IClothProps): JSX.Element => {
   };
 
   const handleChangeCreateText = (event: any) => {
-    console.log(event.target.name, event.target.value);
     setCreateValidation({
       ...createValidation,
       [event.target.name]: event.target.value,
