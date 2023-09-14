@@ -5,6 +5,7 @@ import {
   DialogTitle,
   Drawer,
   FormControl,
+  FormControlLabel,
   Grid,
   IconButton,
   InputLabel,
@@ -13,6 +14,7 @@ import {
   PaletteColorOptions,
   Paper,
   Select,
+  Switch,
   Table,
   TableBody,
   TableCell,
@@ -31,14 +33,17 @@ import React, { useState, useEffect } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
   FilterAlt as FilterAltIcon,
+  Check as CheckIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+import PropTypes from 'prop-types';
 import {
-  IOrder,
-  IOrderCreate,
-  IOrderProps,
-  IOrderUpdate,
-  OrderStatuses,
+  ClothSizes,
+  IStore,
+  IStoreCreate,
+  IStoreProps,
+  IStoreUpdate,
 } from '../../Redux/interfaces';
 import { EnumSort } from '../../utils/enums/enum.sort';
 
@@ -86,32 +91,29 @@ const theme = createTheme({
   },
 });
 
-const Order = (props: IOrderProps): JSX.Element => {
+const Store = (props: IStoreProps): JSX.Element => {
   useEffect(() => {
-    props.getOrderThunk();
+    props.getStoreThunk();
   }, []);
-  const orders = props.order?.order || [];
-  const orderCount = props.order?.orderCount || 0;
-  console.log(orders);
+
+  const stores = props.store?.store || [];
+  const storeCount = props.store.storeCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
-    clientId: '',
-    clothIdList: [] as string[],
-    status: OrderStatuses.CREATED,
+    address: '',
+    isActive: false,
   });
 
   const [editValidation, setEditValidation] = useState({
     id: NaN,
-    clientId: '',
-    clothIdList: [] as string[],
-    status: '' as OrderStatuses,
+    address: '',
+    isActive: false,
   });
 
   const [filter, setFilter] = useState({
     id: '',
-    clientId: '',
-    clothIdList: [] as string[],
-    status: '' as OrderStatuses,
+    address: '',
+    isActive: false,
   });
 
   const [deleteValidation, setDeleteValidation] = useState({
@@ -131,9 +133,9 @@ const Order = (props: IOrderProps): JSX.Element => {
   const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
   const [orderBy, setOrderBy] = React.useState('id');
 
-  const IsolatedMenu = (order: IOrder) => {
+  const IsolatedMenu = (store: IStore) => {
     const menuOpen = Boolean(anchorEl);
-    const { id } = order;
+    const { id } = store;
 
     const handleMenuClick =
       (id: number) => (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -146,9 +148,9 @@ const Order = (props: IOrderProps): JSX.Element => {
       setAnchorId(null);
     };
 
-    const handleEditClick = (order: IOrder) => () => {
+    const handleEditClick = (store: IStore) => () => {
       handleMenuClose();
-      handleClickEditDialogOpen(order);
+      handleClickEditDialogOpen(store);
     };
 
     const handleDeleteClick = (id: number) => () => {
@@ -161,14 +163,14 @@ const Order = (props: IOrderProps): JSX.Element => {
         <Menu
           id="basic-menu"
           anchorEl={anchorEl}
-          open={menuOpen && anchorId === order.id}
+          open={menuOpen && anchorId === store.id}
           onClose={handleMenuClose}
           MenuListProps={{
             'aria-labelledby': 'basic-button',
           }}
           disableScrollLock={true}
         >
-          <MenuItem onClick={handleEditClick(order)}>Редагувати</MenuItem>
+          <MenuItem onClick={handleEditClick(store)}>Редагувати</MenuItem>
           <MenuItem onClick={handleDeleteClick(id)}>Видалити</MenuItem>
         </Menu>
       ),
@@ -186,72 +188,32 @@ const Order = (props: IOrderProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Створити замовлення
+            Створити магазин
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm onSubmit={handleCreateOrder} className="dialogContent">
+          <ValidatorForm onSubmit={handleCreateStore} className="dialogContent">
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="ID клієнта"
+              label="Адреса"
               onChange={handleChangeCreateText}
-              name="clientId"
+              name="address"
               color="button"
-              value={clientId}
-              validators={['required']}
-              errorMessages={["Це поле обов'язкове"]}
+              value={address}
+              validators={['minStringLength:2']}
+              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
             />
-            <Tooltip title='Перелік ID через ","'>
-              <span>
-                <TextValidator
-                  fullWidth
-                  variant={'outlined'}
-                  label="Список ID товарів"
-                  onChange={handleChangeCreateText}
-                  name="clothIdList"
-                  color="button"
-                  value={clothIdList}
-                  validators={['required']}
-                  errorMessages={["Це поле обов'язкове"]}
-                  className="formElem"
-                />
-              </span>
-            </Tooltip>
-            <FormControl fullWidth className="formElem">
-              <InputLabel id="demo-simple-select-label" color="button">
-                Статус замовлення
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={status}
-                label="Статус замовлення"
-                color="button"
-                name="status"
-                onChange={handleChangeCreateText}
-              >
-                <MenuItem value={OrderStatuses.CREATED}>
-                  {OrderStatuses.CREATED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.PROCESSING}>
-                  {OrderStatuses.PROCESSING}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.PAYED}>
-                  {OrderStatuses.PAYED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.SENT}>
-                  {OrderStatuses.SENT}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.DELIVERED}>
-                  {OrderStatuses.DELIVERED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.COMPLETED}>
-                  {OrderStatuses.COMPLETED}
-                </MenuItem>
-              </Select>
-            </FormControl>
+            <FormControlLabel
+              checked={isActive}
+              onChange={handleChangeCreateText}
+              control={<Switch color="button" />}
+              label="Чи працює"
+              labelPlacement="end"
+              name="isActive"
+              className="formElem"
+            />
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -284,72 +246,32 @@ const Order = (props: IOrderProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Редагувати замовлення
+            Редагувати магазин
           </Typography>
         </DialogTitle>
         <DialogContent>
-          <ValidatorForm onSubmit={handleEditOrder} className="dialogContent">
+          <ValidatorForm onSubmit={handleEditStore} className="dialogContent">
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="ID клієнта"
+              label="Адреса"
               onChange={handleChangeEditText}
-              name="clientId"
+              name="address"
               color="button"
-              value={editClientId}
-              validators={['required']}
-              errorMessages={["Це поле обов'язкове"]}
+              value={editAddress}
+              validators={['minStringLength:2']}
+              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
             />
-            <Tooltip title='Перелік ID через ","'>
-              <span>
-                <TextValidator
-                  fullWidth
-                  variant={'outlined'}
-                  label="Список ID товарів"
-                  onChange={handleChangeEditText}
-                  name="clothIdList"
-                  color="button"
-                  value={editClothIdList}
-                  validators={['required']}
-                  errorMessages={["Це поле обов'язкове"]}
-                  className="formElem"
-                />
-              </span>
-            </Tooltip>
-            <FormControl fullWidth className="formElem">
-              <InputLabel id="demo-simple-select-label" color="button">
-                Статус замовлення
-              </InputLabel>
-              <Select
-                labelId="demo-simple-select-label"
-                id="demo-simple-select"
-                value={editStatus}
-                label="Статус замовлення"
-                color="button"
-                name="status"
-                onChange={handleChangeEditText}
-              >
-                <MenuItem value={OrderStatuses.CREATED}>
-                  {OrderStatuses.CREATED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.PROCESSING}>
-                  {OrderStatuses.PROCESSING}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.PAYED}>
-                  {OrderStatuses.PAYED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.SENT}>
-                  {OrderStatuses.SENT}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.DELIVERED}>
-                  {OrderStatuses.DELIVERED}
-                </MenuItem>
-                <MenuItem value={OrderStatuses.COMPLETED}>
-                  {OrderStatuses.COMPLETED}
-                </MenuItem>
-              </Select>
-            </FormControl>
+            <FormControlLabel
+              checked={editIsActive}
+              onChange={handleChangeEditText}
+              control={<Switch color="button" />}
+              label="Чи працює"
+              labelPlacement="end"
+              name="isActive"
+              className="formElem"
+            />
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -382,7 +304,7 @@ const Order = (props: IOrderProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            {`Видалити замовлення з ID "${deleteId}" ?`}
+            {`Видалити магазин "${deleteId}" ?`}
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -401,7 +323,7 @@ const Order = (props: IOrderProps): JSX.Element => {
             <Button
               variant="contained"
               color="button"
-              onClick={handleDeleteOrder(deleteId)}
+              onClick={handleDeleteStore(deleteId)}
             >
               Видалити
             </Button>
@@ -411,20 +333,19 @@ const Order = (props: IOrderProps): JSX.Element => {
     );
   };
 
-  const updateOrderList = (
+  const updateStoreList = (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
-    props.getOrderThunk({
+    props.getStoreThunk({
       limit: rows,
       page: page,
       filter: {
         id: parseInt(filter.id),
-        clientId: filter.clientId,
-        clothIdList: filter.clothIdList,
-        status: filter.status,
+        address: filter.address,
+        isActive: filter.isActive,
       },
       sort: {
         order: orderString,
@@ -437,58 +358,39 @@ const Order = (props: IOrderProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateOrder = () => {
-    const createOrderData = {
-      clientId: createValidation.clientId,
-      clothIdList: createValidation.clothIdList,
-      status: createValidation.status,
-    } as IOrderCreate;
+  const handleCreateStore = () => {
+    const createStoreData = {
+      address: createValidation.address,
+      isActive: createValidation.isActive,
+    } as IStoreCreate;
 
-    props.createOrderThunk(createOrderData);
-    updateOrderList(pagination.rows, pagination.page);
+    props.createStoreThunk(createStoreData);
+    updateStoreList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
-  const handleEditOrder = () => {
-    const OrderChanged = orders.find((order) => order.id === editValidation.id);
+  const handleEditStore = () => {
+    const StoreChanged = stores.find((store) => store.id === editValidation.id);
 
-    if (!OrderChanged) {
+    if (!StoreChanged) {
       handleEditDialogClose();
       return;
     }
 
-    let isClothIdListChanged =
-      OrderChanged.clothIdList.length !== editValidation.clothIdList.length;
-
-    if (!isClothIdListChanged) {
-      isClothIdListChanged = editValidation.clothIdList.reduce((prev, cur) => {
-        if (prev) {
-          return prev;
-        }
-        if (OrderChanged.clothIdList.indexOf(cur) === -1) {
-          return true;
-        }
-        return false;
-      }, false);
-    }
-
-    const editOrderData = {
+    const editStoreData = {
       id: editValidation.id,
-      clientid:
-        editValidation.clientId !== OrderChanged.clientId
-          ? editValidation.clientId
+      address:
+        editValidation.address !== StoreChanged.address
+          ? editValidation.address
           : undefined,
-      clothIdList: isClothIdListChanged
-        ? editValidation.clothIdList
-        : undefined,
-      status:
-        editValidation.status !== OrderChanged.status
-          ? editValidation.status
+      isActive:
+        editValidation.isActive !== StoreChanged.isActive
+          ? editValidation.isActive
           : undefined,
-    } as IOrderUpdate;
+    } as IStoreUpdate;
 
-    props.updateOrderThunk(editOrderData);
-    updateOrderList(pagination.rows, pagination.page);
+    props.updateStoreThunk(editStoreData);
+    updateStoreList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
 
@@ -499,18 +401,16 @@ const Order = (props: IOrderProps): JSX.Element => {
   const handleCreateDialogClose = () => {
     setCreateOpen(false);
     setCreateValidation({
-      clientId: '',
-      clothIdList: [],
-      status: OrderStatuses.CREATED,
+      address: '',
+      isActive: false,
     });
   };
 
-  const handleClickEditDialogOpen = (order: IOrder) => {
+  const handleClickEditDialogOpen = (store: IStore) => {
     setEditValidation({
-      id: order.id,
-      clientId: order.clientId,
-      clothIdList: order.clothIdList,
-      status: order.status,
+      id: store.id,
+      address: store.address,
+      isActive: store.isActive,
     });
     setEditOpen(true);
   };
@@ -519,9 +419,8 @@ const Order = (props: IOrderProps): JSX.Element => {
     setEditOpen(false);
     setEditValidation({
       id: NaN,
-      clientId: '',
-      clothIdList: [],
-      status: '' as OrderStatuses,
+      address: '',
+      isActive: false,
     });
   };
 
@@ -535,33 +434,38 @@ const Order = (props: IOrderProps): JSX.Element => {
     setDeleteValidation({ id: NaN });
   };
 
-  const handleDeleteOrder = (id: number) => () => {
-    props.deleteOrderThunk({ id });
-    updateOrderList(pagination.rows, pagination.page);
+  const handleDeleteStore = (id: number) => () => {
+    props.deleteStoreThunk({ id });
+    updateStoreList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
 
   const handleChangeCreateText = (event: any) => {
-    setCreateValidation({
-      ...createValidation,
-      [event.target.name]: event.target.value,
-    });
+    if (event.target.type === 'checkbox') {
+      setCreateValidation({
+        ...createValidation,
+        [event.target.name]: event.target.checked,
+      });
+    } else {
+      setCreateValidation({
+        ...createValidation,
+        [event.target.name]: event.target.value,
+      });
+    }
   };
 
   const handleChangeEditText = (event: any) => {
-    if (event.target.name === 'clothIdList') {
+    if (event.target.type === 'checkbox') {
       setEditValidation({
         ...editValidation,
-        [event.target.name]:
-          event.target.value?.trim()?.split(',') || event.target.value,
+        [event.target.name]: event.target.checked,
       });
-      return;
+    } else {
+      setEditValidation({
+        ...editValidation,
+        [event.target.name]: event.target.value,
+      });
     }
-
-    setEditValidation({
-      ...editValidation,
-      [event.target.name]: event.target.value,
-    });
   };
 
   const handleChangeFilterText = (event: any) => {
@@ -573,24 +477,24 @@ const Order = (props: IOrderProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
-    updateOrderList(pagination.rows, newPage);
+    updateStoreList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
-    updateOrderList(parseInt(event.target.value, 10), 0);
+    updateStoreList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterOrder = () => {
+  const handleFilterStore = () => {
     setPagination({ ...pagination, page: 0 });
 
-    updateOrderList(pagination.rows, 0);
+    updateStoreList(pagination.rows, 0);
   };
 
   const handleSort = (property: string) => () => {
@@ -599,23 +503,18 @@ const Order = (props: IOrderProps): JSX.Element => {
     setOrder(orderString);
     setOrderBy(property);
     setPagination({ rows: pagination.rows, page: 0 });
-    updateOrderList(pagination.rows, 0, orderString, property);
+    updateStoreList(pagination.rows, 0, orderString, property);
   };
 
-  const { clientId, clothIdList, status } = createValidation;
+  const { address, isActive } = createValidation;
 
   const { id: deleteId } = deleteValidation;
-  const {
-    clientId: editClientId,
-    clothIdList: editClothIdList,
-    status: editStatus,
-  } = editValidation;
+  const { address: editAddress, isActive: editIsActive } = editValidation;
 
   const {
     id: filterId,
-    clientId: filterClientId,
-    clothIdList: filterClothIdList,
-    status: filterStatus,
+    address: filterAddress,
+    isActive: filterIsActive,
   } = filter;
 
   return (
@@ -635,38 +534,20 @@ const Order = (props: IOrderProps): JSX.Element => {
               </TableCell>
               <TableCell align="center">
                 <TableSortLabel
-                  active={orderBy === 'clientId'}
-                  direction={orderBy === 'clientId' ? order : 'asc'}
-                  onClick={handleSort('clientId')}
+                  active={orderBy === 'email'}
+                  direction={orderBy === 'email' ? order : 'asc'}
+                  onClick={handleSort('email')}
                 >
-                  ID клієнта
+                  Адреса
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">
                 <TableSortLabel
-                  active={orderBy === 'clothIdList'}
-                  direction={orderBy === 'clothIdList' ? order : 'asc'}
-                  onClick={handleSort('clothIdList')}
+                  active={orderBy === 'name'}
+                  direction={orderBy === 'name' ? order : 'asc'}
+                  onClick={handleSort('name')}
                 >
-                  ID замовлених товарів
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
-                  active={orderBy === 'status'}
-                  direction={orderBy === 'status' ? order : 'asc'}
-                  onClick={handleSort('status')}
-                >
-                  Статус замовлення
-                </TableSortLabel>
-              </TableCell>
-              <TableCell align="center">
-                <TableSortLabel
-                  active={orderBy === 'price'}
-                  direction={orderBy === 'price' ? order : 'asc'}
-                  onClick={handleSort('price')}
-                >
-                  Ціна замовлення
+                  Чи працює
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
@@ -727,40 +608,54 @@ const Order = (props: IOrderProps): JSX.Element => {
                       />
                       <TextField
                         fullWidth
-                        label="ID клієнта"
+                        label="ПІБ"
                         className="drawerFilterElem"
-                        value={filterClientId}
+                        value={filterAddress}
                         onChange={handleChangeFilterText}
-                        name="clientId"
+                        name="address"
                         color="button"
                       />
-                      <Tooltip title='Перелік ID через ","'>
-                        <span>
-                          <TextField
-                            fullWidth
-                            label="Список ID товарів"
-                            className="drawerFilterElem"
-                            value={filterClothIdList}
-                            onChange={handleChangeFilterText}
-                            name="clothIdList"
-                            color="button"
-                          />
-                        </span>
-                      </Tooltip>
-                      <TextField
-                        fullWidth
-                        label="Статус замовлення"
-                        className="drawerFilterElem"
-                        value={filterStatus}
-                        onChange={handleChangeFilterText}
-                        name="status"
-                        color="button"
-                      />
+                      <FormControl fullWidth>
+                        <InputLabel
+                          id="demo-simple-select-label"
+                          color="button"
+                        >
+                          Розмір одягу
+                        </InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={filterIsActive}
+                          label="Розмір одягу"
+                          color="button"
+                          name="isActive"
+                          onChange={handleChangeFilterText}
+                        >
+                          <MenuItem value={ClothSizes.XS}>
+                            {ClothSizes.XS}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.S}>
+                            {ClothSizes.S}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.M}>
+                            {ClothSizes.M}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.L}>
+                            {ClothSizes.L}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.XL}>
+                            {ClothSizes.XL}
+                          </MenuItem>
+                          <MenuItem value={ClothSizes.XXL}>
+                            {ClothSizes.XXL}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                     <Button
                       color="button"
                       variant="contained"
-                      onClick={handleFilterOrder}
+                      onClick={handleFilterStore}
                     >
                       Застосувати
                     </Button>
@@ -770,27 +665,23 @@ const Order = (props: IOrderProps): JSX.Element => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {orders?.map((order) => {
-              const menu = IsolatedMenu(order);
+            {stores?.map((store) => {
+              const menu = IsolatedMenu(store);
               return (
-                <TableRow key={order.id}>
-                  <TableCell align="center">{order.id}</TableCell>
-                  <TableCell align="center">{order.clientId}</TableCell>
+                <TableRow key={store.id}>
+                  <TableCell align="center">{store.id}</TableCell>
+                  <TableCell align="center">{store.address}</TableCell>
                   <TableCell align="center">
-                    <Grid container justifyContent="center">
-                      {order.clothIdList.map((clothId) => (
-                        <span key={clothId} className="sizeSpan">
-                          {clothId}
-                        </span>
-                      ))}
-                    </Grid>
+                    {store.isActive ? (
+                      <CheckIcon color="success" />
+                    ) : (
+                      <ClearIcon color="error" />
+                    )}
                   </TableCell>
-                  <TableCell align="center">{order.status}</TableCell>
-                  <TableCell align="center">{order.price}</TableCell>
-                  <TableCell align="center">{order.updatedAt}</TableCell>
-                  <TableCell align="center">{order.updatedBy}</TableCell>
+                  <TableCell align="center">{store.updatedAt}</TableCell>
+                  <TableCell align="center">{store.updatedBy}</TableCell>
                   <TableCell align="center">
-                    <IconButton onClick={menu.handleMenuClick(order.id)}>
+                    <IconButton onClick={menu.handleMenuClick(store.id)}>
                       <MoreHorizIcon />
                     </IconButton>
                     {menu.jsx}
@@ -805,7 +696,7 @@ const Order = (props: IOrderProps): JSX.Element => {
         {DeleteDialog(deleteId)}
         <TablePagination
           component="div"
-          count={orderCount || 0}
+          count={storeCount || 0}
           page={pagination.page}
           onPageChange={handleChangePage}
           rowsPerPage={pagination.rows}
@@ -816,4 +707,8 @@ const Order = (props: IOrderProps): JSX.Element => {
   );
 };
 
-export default Order;
+Store.propTypes = {
+  store: PropTypes.array,
+};
+
+export default Store;

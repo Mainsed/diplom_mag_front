@@ -4,12 +4,16 @@ import ReduxThunk from 'redux-thunk';
 import clientReducer from './reducers/clientReducer';
 import clothReducer from './reducers/clothReducer';
 import orderReducer from './reducers/orderReducer';
+import storeReducer from './reducers/storeReducer';
+import deliveryReducer from './reducers/deliveryReducer';
 
 const reducers = combineReducers({
   staff: staffReducer,
   client: clientReducer,
   cloth: clothReducer,
   order: orderReducer,
+  store: storeReducer,
+  delivery: deliveryReducer,
 });
 
 const store = createStore(reducers, applyMiddleware(ReduxThunk));

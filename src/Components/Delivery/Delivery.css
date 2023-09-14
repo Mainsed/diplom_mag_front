@@ -1,0 +1,20 @@
+.clothDeliverySizesBox {
+  width: 100%;
+}
+
+.clothDeliverySizeText {
+  width: 100px;
+}
+
+.clothDeliveryNewSizeText {
+  width: 150px;
+}
+
+.clothDeliverySizeTitle {
+  width: fit-content;
+}
+
+.clothDeliverySizePaper {
+  padding: 10px;
+  margin: 25px
+}
