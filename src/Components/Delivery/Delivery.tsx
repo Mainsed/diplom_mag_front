@@ -34,9 +34,9 @@ import {
   FilterAlt as FilterAltIcon,
   KeyboardArrowUp as KeyboardArrowUpIcon,
   KeyboardArrowDown as KeyboardArrowDownIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-import PropTypes from 'prop-types';
 import {
   DeliveryType,
   IClothDelivered,
@@ -99,7 +99,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     props.getDeliveryThunk();
   }, []);
 
-  const deliverys = props.delivery?.delivery || [];
+  const delivers = props.delivery?.delivery || [];
   const deliveryCount = props.delivery.deliveryCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
@@ -107,21 +107,22 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     deliveredFrom: '',
     typeOfDelivery: '' as DeliveryType,
     price: '',
-    clothDelivered: [] as IClothDelivered[],
   });
 
   const [editValidation, setEditValidation] = useState({
     id: '',
     deliveredTo: '',
     deliveredFrom: '',
+    typeOfDelivery: '',
     price: '',
-    clothDelivered: [] as IClothDelivered[],
   });
 
-  const [clothDeliverValidation, setClothDeliverValidation] = useState([
+  const [clothDeliverValidation, setClothDeliverValidation] = useState<
+    IClothDelivered[]
+  >([
     {
-      clothId: '',
-      sizes: [] as IDeliverySizeCount[],
+      clothId: 0,
+      sizes: [],
     },
   ]);
 
@@ -204,7 +205,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
         sx={{
           '& .MuiDialog-container': {
             '& .MuiPaper-root': {
-              maxWidth: '1000px', // Set your width here
+              maxWidth: '1000px',
             },
           },
         }}
@@ -223,42 +224,48 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
             <TextValidator
               fullWidth
               variant={'outlined'}
-              label="Назва"
+              label="Доставка в"
               onChange={handleChangeCreateText}
               name="deliveredTo"
               color="button"
               value={deliveredTo}
-              validators={['minStringLength:2', 'required']}
-              errorMessages={[
-                'Мінімальна дозволена довжена - 2 символи',
-                "Це поле обов'язкове",
-              ]}
-              className="formElem"
-            />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Опис товару"
-              onChange={handleChangeCreateText}
-              name="deliveredFrom"
-              color="button"
-              value={deliveredFrom}
-              validators={['minStringLength:2']}
-              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
-              className="formElem"
-            />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Ціна"
-              onChange={handleChangeCreateText}
-              name="price"
-              color="button"
-              value={price}
               validators={['required']}
               errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
+            {typeOfDelivery === DeliveryType.INTERNAL ? (
+              <TextValidator
+                fullWidth
+                variant={'outlined'}
+                label="Доставка з"
+                onChange={handleChangeCreateText}
+                name="deliveredFrom"
+                color="button"
+                value={deliveredFrom}
+                validators={['required']}
+                errorMessages={["Це поле обов'язкове"]}
+                className="formElem"
+              />
+            ) : (
+              ''
+            )}
+            {typeOfDelivery === DeliveryType.EXTERNAL ? (
+              <TextValidator
+                fullWidth
+                variant={'outlined'}
+                label="Ціна"
+                onChange={handleChangeCreateText}
+                name="price"
+                color="button"
+                type="number"
+                value={price}
+                validators={['required']}
+                errorMessages={["Це поле обов'язкове"]}
+                className="formElem"
+              />
+            ) : (
+              ''
+            )}
             <FormControl fullWidth className="formElem">
               <InputLabel id="select-label" color="button">
                 Тип поставки
@@ -280,7 +287,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                 ))}
               </Select>
             </FormControl>
-            {ClothDeliverySizes()}
+            {Clothdeliversizes()}
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -309,6 +316,13 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
         onClose={handleEditDialogClose}
         open={editDialogOpen}
         className="dialog"
+        sx={{
+          '& .MuiDialog-container': {
+            '& .MuiPaper-root': {
+              maxWidth: '1000px',
+            },
+          },
+        }}
         fullWidth
       >
         <DialogTitle>
@@ -321,54 +335,52 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
             onSubmit={handleEditDelivery}
             className="dialogContent"
           >
+            {editTypeOfDelivery === DeliveryType.INTERNAL ? (
+              <TextValidator
+                fullWidth
+                variant={'outlined'}
+                label="Доставка з"
+                onChange={handleChangeEditText}
+                name="deliveredFrom"
+                color="button"
+                value={editDeliveredFrom}
+                validators={['required']}
+                errorMessages={["Це поле обов'язкове"]}
+                className="formElem"
+              />
+            ) : (
+              ''
+            )}
             <TextValidator
               fullWidth
               variant={'outlined'}
               label="Опис"
               onChange={handleChangeEditText}
-              name="deliveredFrom"
-              color="button"
-              value={editDeliveredFrom}
-              validators={['required']}
-              errorMessages={["Це поле обов'язкове"]}
-              className="formElem"
-            />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Опис"
-              onChange={handleChangeEditText}
-              name="deliveredTo"
+              name="Доставка в"
               color="button"
               value={editDeliveredTo}
               validators={['required']}
               errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Ціна"
-              onChange={handleChangeEditText}
-              name="price"
-              color="button"
-              value={editPrice}
-              validators={['required']}
-              errorMessages={["Це поле обов'язкове"]}
-              className="formElem"
-            />
-            <TextValidator
-              fullWidth
-              variant={'outlined'}
-              label="Назва"
-              onChange={handleChangeEditText}
-              name="сlothDelivered"
-              color="button"
-              value={editClothDelivered}
-              validators={['minStringLength:2']}
-              errorMessages={['Мінімальна дозволена довжена - 2 символи']}
-              className="formElem"
-            />
+            {editTypeOfDelivery === DeliveryType.EXTERNAL ? (
+              <TextValidator
+                fullWidth
+                variant={'outlined'}
+                label="Ціна"
+                onChange={handleChangeEditText}
+                name="price"
+                color="button"
+                type="number"
+                value={editPrice}
+                validators={['required']}
+                errorMessages={["Це поле обов'язкове"]}
+                className="formElem"
+              />
+            ) : (
+              ''
+            )}
+            {Clothdeliversizes()}
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -430,7 +442,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     );
   };
 
-  const ClothDeliverySizes = () => {
+  const Clothdeliversizes = () => {
     return (
       <Grid container className="clothDeliverySizesBox">
         {clothDeliverValidation.map((clothDeliver, i) => {
@@ -455,6 +467,10 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   validators={['required']}
                   errorMessages={["Це поле обов'язкове"]}
                   className="formElem"
+                  onFocus={(event: any) => {
+                    event.target.select();
+                  }}
+                  type="number"
                 />
                 <Typography align="center">Розміри</Typography>
 
@@ -484,11 +500,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                         onChange={handleClothDeliverChange(i)}
                         validators={['required']}
                         errorMessages={["Це поле обов'язкове"]}
-                      />
+                      /> шт.
                       <IconButton
                         onClick={handleRemoveClothDeliverSize(i, size.size)}
                       >
-                        X
+                        <ClearIcon />
                       </IconButton>
                     </Grid>
                   );
@@ -503,7 +519,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                       variant={'outlined'}
                       label="Новий розмір"
                       onChange={handleAddClothDeliverSize(i)}
-                      name="newDeliverySize"
+                      name="newdeliversize"
                       color="button"
                       className="clothDeliveryNewSizeText"
                       value=""
@@ -519,9 +535,13 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   ''
                 )}
                 <Grid container justifyContent="space-evenly">
-                  <Button color="button" onClick={handleAddClothDeliver(i)}>
-                    Підтвердити
-                  </Button>
+                  {clothDeliverValidation.length === i + 1 ? (
+                    <Button color="button" onClick={handleAddClothDeliver(i)}>
+                      Додати товар
+                    </Button>
+                  ) : (
+                    ''
+                  )}
                   <Button color="error" onClick={handleRemoveClothDeliver(i)}>
                     Видалити
                   </Button>
@@ -569,7 +589,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const handleCreateDelivery = () => {
     const createDeliveryData = {
-      clothDelivered: createValidation.clothDelivered,
+      clothDelivered: clothDeliverValidation,
       deliveredTo: parseInt(createValidation.deliveredTo),
       typeOfDelivery: createValidation.typeOfDelivery,
       deliveredFrom: parseInt(createValidation.deliveredFrom),
@@ -582,7 +602,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
   };
 
   const handleEditDelivery = () => {
-    const DeliveryChanged = deliverys.find(
+    const DeliveryChanged = delivers.find(
       (delivery) => delivery.id === parseInt(editValidation.id),
     );
 
@@ -602,8 +622,8 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           ? parseInt(editValidation.deliveredTo)
           : undefined,
       clothDelivered:
-        editValidation.clothDelivered !== DeliveryChanged.clothDelivered
-          ? editValidation.clothDelivered
+        clothDeliverValidation !== DeliveryChanged.clothDelivered
+          ? clothDeliverValidation
           : undefined,
       price:
         parseInt(editValidation.price) !== DeliveryChanged.price
@@ -627,11 +647,10 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       deliveredFrom: '',
       typeOfDelivery: '' as DeliveryType,
       price: '',
-      clothDelivered: [] as IClothDelivered[],
     });
     setClothDeliverValidation([
       {
-        clothId: '',
+        clothId: 0,
         sizes: [] as IDeliverySizeCount[],
       },
     ]);
@@ -642,9 +661,10 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       id: delivery.id.toString(),
       deliveredTo: delivery.deliveredTo.toString(),
       deliveredFrom: delivery?.deliveredFrom?.toString() || '',
+      typeOfDelivery: delivery.typeOfDelivery,
       price: delivery?.price?.toString() || '',
-      clothDelivered: [] as IClothDelivered[],
     });
+    setClothDeliverValidation(delivery.clothDelivered);
     setEditOpen(true);
   };
 
@@ -654,9 +674,15 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       id: '',
       deliveredTo: '',
       deliveredFrom: '',
+      typeOfDelivery: '',
       price: '',
-      clothDelivered: [] as IClothDelivered[],
     });
+    setClothDeliverValidation([
+      {
+        clothId: 0,
+        sizes: [] as IDeliverySizeCount[],
+      },
+    ]);
   };
 
   const handleClickDeleteDialogOpen = (id: number) => {
@@ -733,7 +759,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     setClothDeliverValidation([
       ...clothDeliverValidation,
       {
-        clothId: '',
+        clothId: 0,
         sizes: [],
       },
     ]);
@@ -822,9 +848,9 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const { id: deleteId } = deleteValidation;
   const {
-    clothDelivered: editClothDelivered,
     deliveredFrom: editDeliveredFrom,
     deliveredTo: editDeliveredTo,
+    typeOfDelivery: editTypeOfDelivery,
     price: editPrice,
   } = editValidation;
 
@@ -856,20 +882,20 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   direction={orderBy === 'name' ? order : 'asc'}
                   onClick={handleSort('name')}
                 >
-                  Назва
+                  Доставка з
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">Опис</TableCell>
+              <TableCell align="center">Доставка в</TableCell>
               <TableCell align="center">
                 <TableSortLabel
                   active={orderBy === 'price'}
                   direction={orderBy === 'price' ? order : 'asc'}
                   onClick={handleSort('price')}
                 >
-                  Ціна
+                  Всього товару доставлено
                 </TableSortLabel>
               </TableCell>
-              <TableCell align="center">Доступні розміри</TableCell>
+              <TableCell align="center">Ціна</TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
               <TableCell align="center">Хто останній раз оновив</TableCell>
               <TableCell align="center">
@@ -958,7 +984,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {deliverys?.map((delivery) => {
+            {delivers?.map((delivery) => {
               const menu = IsolatedMenu(delivery);
               return (
                 <React.Fragment key={'tab' + delivery.id}>
@@ -981,9 +1007,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                     </TableCell>
                     <TableCell align="center">{delivery.deliveredTo}</TableCell>
                     <TableCell align="center">
-                      {delivery.totalAmountDelivered}
+                      {delivery.totalAmountDelivered} шт.
                     </TableCell>
-                    <TableCell align="center">{delivery.price}</TableCell>
+                    <TableCell align="center">
+                      {!Number.isNaN(delivery.price) ? delivery.price : ''}
+                    </TableCell>
                     <TableCell align="center">{delivery.updatedAt}</TableCell>
                     <TableCell align="center">{delivery.updatedBy}</TableCell>
                     <TableCell align="center">
@@ -1056,11 +1084,6 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       </ThemeProvider>
     </TableContainer>
   );
-};
-
-Delivery.propTypes = {
-  delivery: PropTypes.any,
-  getClothSizesThunk: PropTypes.any,
 };
 
 export default Delivery;
