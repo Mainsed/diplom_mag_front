@@ -5,3 +5,6 @@ export * from './cloth.interface';
 export * from './order.interface';
 export * from './store.interface';
 export * from './delivery.interface';
+export * from './reports.interface';
+export * from './auth.interface';
+export * from './app.interface';

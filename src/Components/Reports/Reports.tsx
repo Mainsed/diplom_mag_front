@@ -1,45 +1,22 @@
 import {
+  Divider,
   Grid,
-  PaletteColorOptions,
   Paper,
   ThemeProvider,
+  Typography,
   createTheme,
 } from '@mui/material';
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
+import { IReportsProps } from '../../Redux/interfaces';
 import {
-  IClientProps,
-} from '../../Redux/interfaces';
+  KeyboardDoubleArrowUp as KeyboardDoubleArrowUpIcon,
+  KeyboardDoubleArrowDown as KeyboardDoubleArrowDownIcon,
+} from '@mui/icons-material';
+import './Reports.css';
+import { MonthNumber } from '../../utils/enums/month-number.enum';
 
-// declaring new color names
-declare module '@mui/material/styles' {
-  interface CustomPalette {
-    button: PaletteColorOptions;
-  }
-  interface Palette extends CustomPalette {}
-  interface PaletteOptions extends CustomPalette {}
-}
-
-declare module '@mui/material/Button' {
-  interface ButtonPropsColorOverrides {
-    button: true;
-  }
-}
-
-declare module '@mui/material/InputBase' {
-  interface InputBasePropsColorOverrides {
-    button: true;
-  }
-}
-
-declare module '@mui/material/FormLabel' {
-  interface FormLabelPropsColorOverrides {
-    button: true;
-  }
-}
-
-declare module '@mui/material/TextField' {
-  interface TextFieldPropsColorOverrides {
+declare module '@mui/material/SvgIcon' {
+  interface SvgIconPropsColorOverrides {
     button: true;
   }
 }
@@ -55,30 +32,358 @@ const theme = createTheme({
   },
 });
 
-const Reports = (props: IClientProps): JSX.Element => {
+const Reports = (props: IReportsProps): JSX.Element => {
   useEffect(() => {
-    props.getClientThunk();
+    props.getReportsThunk();
   }, []);
-
-  return <ThemeProvider theme={theme}>
-    <Grid container>
-      <Grid item xs={4}>
-        <Paper>Топ 5 магазинів за продажами</Paper>
+  return (
+    <ThemeProvider theme={theme}>
+      <Grid container justifyContent="space-evenly">
+        <Grid item xs={4}>
+          <Paper className="reportPaper" elevation={5}>
+            <Typography
+              align="center"
+              variant="h6"
+              className="reportPaperTitle"
+            >
+              Топ 5 магазинів за продажами за пів року
+            </Typography>
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center">Номер магазину</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Кількість продажів</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Зміна продажів</Typography>
+              </Grid>
+            </Grid>
+            <Divider
+              sx={{
+                'border-color': '#78C091',
+              }}
+            />
+            {(props.reports?.reports?.storesBySales || []).map((store) => {
+              return (
+                <Grid key={store.storeId}>
+                  <Grid
+                    container
+                    justifyContent="space-evenly"
+                    className="reportRow"
+                  >
+                    <Grid item xs={4}>
+                      <Typography align="center">{store.storeId}</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {store.numberOfSales} шт.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        <Grid
+                          container
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          {store.change > 0 ? (
+                            <KeyboardDoubleArrowUpIcon color="button" />
+                          ) : (
+                            <KeyboardDoubleArrowDownIcon color="error" />
+                          )}
+                          {store.change} шт.
+                        </Grid>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Divider
+                    sx={{
+                      'border-color': '#78C091',
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Paper className="reportPaper" elevation={5}>
+            <Typography
+              align="center"
+              variant="h6"
+              className="reportPaperTitle"
+            >
+              Топ 5 товарів за продажами за пів року
+            </Typography>
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center">Номер товару</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Кількість продажів</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Зміна продажів</Typography>
+              </Grid>
+            </Grid>
+            <Divider
+              sx={{
+                'border-color': '#78C091',
+              }}
+            />
+            {(props.reports?.reports?.clothesBySales || []).map((cloth) => {
+              return (
+                <Grid key={cloth.clothId}>
+                  <Grid
+                    container
+                    justifyContent="space-evenly"
+                    className="reportRow"
+                  >
+                    <Grid item xs={4}>
+                      <Typography align="center">{cloth.clothId}</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {cloth.numberOfSales} шт.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        <Grid
+                          container
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          {cloth.change > 0 ? (
+                            <KeyboardDoubleArrowUpIcon color="button" />
+                          ) : (
+                            <KeyboardDoubleArrowDownIcon color="error" />
+                          )}
+                          {cloth.change} шт.
+                        </Grid>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Divider
+                    sx={{
+                      'border-color': '#78C091',
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Paper className="reportPaper" elevation={5}>
+            <Typography
+              align="center"
+              variant="h6"
+              className="reportPaperTitle"
+            >
+              Топ 5 розмірів за популярністю за пів року
+            </Typography>
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center">Розмір</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Кількість продажів</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Зміна продажів</Typography>
+              </Grid>
+            </Grid>
+            <Divider
+              sx={{
+                'border-color': '#78C091',
+              }}
+            />
+            {(props.reports?.reports?.sizePopularity || []).map((size) => {
+              return (
+                <Grid key={size.size}>
+                  <Grid
+                    container
+                    justifyContent="space-evenly"
+                    className="reportRow"
+                  >
+                    <Grid item xs={4}>
+                      <Typography align="center">{size.size}</Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {size.numberOfSales} шт.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        <Grid
+                          container
+                          justifyContent="center"
+                          alignItems="center"
+                        >
+                          {size.change > 0 ? (
+                            <KeyboardDoubleArrowUpIcon color="button" />
+                          ) : (
+                            <KeyboardDoubleArrowDownIcon color="error" />
+                          )}
+                          {size.change} шт.
+                        </Grid>
+                      </Typography>
+                    </Grid>
+                  </Grid>
+                  <Divider
+                    sx={{
+                      'border-color': '#78C091',
+                    }}
+                  />
+                </Grid>
+              );
+            })}
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Paper className="reportPaper" elevation={5}>
+            <Typography
+              align="center"
+              variant="h6"
+              className="reportPaperTitle"
+            >
+              Кількість нових та звільнених працівників за пів року
+            </Typography>
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center">Місяць</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Найнято працівників</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Звільнено працівників</Typography>
+              </Grid>
+            </Grid>
+            <Divider
+              sx={{
+                'border-color': '#78C091',
+              }}
+            />
+            {(props.reports?.reports?.staffChanges.staffChangesByMonth || []).map(
+              (income) => {
+                return (
+                  <Grid key={income.monthNumber}>
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      className="reportRow"
+                    >
+                      <Grid item xs={4}>
+                        <Typography align="center">
+                          {MonthNumber[income.monthNumber]}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography align="center">
+                          {income.hiredStaffCount} чол.
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography align="center">
+                          {income.firedStaffCount} чол.
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider
+                      sx={{
+                        'border-color': '#78C091',
+                      }}
+                    />
+                  </Grid>
+                );
+              }
+            )}
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={8}>
+                <Typography align="center" variant="h6">
+                  Загальна кількість працівників
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center" variant="h6">
+                  {props.reports?.reports?.staffChanges.totalStaffNumber} чол.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
+        <Grid item xs={4}>
+          <Paper className="reportPaper" elevation={5}>
+            <Typography
+              align="center"
+              variant="h6"
+              className="reportPaperTitle"
+            >
+              Дохід за останні пів року
+            </Typography>
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center">Місяць</Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center">Дохід</Typography>
+              </Grid>
+            </Grid>
+            <Divider
+              sx={{
+                'border-color': '#78C091',
+              }}
+            />
+            {(props.reports?.reports?.halfYearIncome.incomeByMonth || []).map(
+              (income) => {
+                return (
+                  <Grid key={income.monthNumber}>
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      className="reportRow"
+                    >
+                      <Grid item xs={4}>
+                        <Typography align="center">
+                          {MonthNumber[income.monthNumber]}
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Typography align="center">
+                          {income.income} грн.
+                        </Typography>
+                      </Grid>
+                    </Grid>
+                    <Divider
+                      sx={{
+                        'border-color': '#78C091',
+                      }}
+                    />
+                  </Grid>
+                );
+              }
+            )}
+            <Grid container justifyContent="space-evenly" className="reportRow">
+              <Grid item xs={4}>
+                <Typography align="center" variant="h6">
+                  Загальний дохід
+                </Typography>
+              </Grid>
+              <Grid item xs={4}>
+                <Typography align="center" variant="h6">
+                  {props.reports?.reports?.halfYearIncome.totalIncome} грн.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Grid>
       </Grid>
-      <Grid item xs={4}>
-        <Paper>Топ 5 товарів за продажами</Paper>
-      </Grid>
-      <Grid item xs={4}>
-        <Paper>Дохід за останні пів року\рік</Paper>
-      </Grid>
-      <Grid item xs={4}>
-        <Paper>Кількість нових та звільнених працівників</Paper>
-      </Grid>
-      <Grid item xs={4}>
-        <Paper>Топ 5 розмірів за популярністю</Paper>
-      </Grid>
-    </Grid>
-  </ThemeProvider>;
+    </ThemeProvider>
+  );
 };
 
 export default Reports;

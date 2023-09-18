@@ -11,7 +11,6 @@ import {
   InputLabel,
   Menu,
   MenuItem,
-  PaletteColorOptions,
   Paper,
   Select,
   Switch,
@@ -48,13 +47,6 @@ import {
 import { EnumSort } from '../../utils/enums/enum.sort';
 
 // declaring new color names
-declare module '@mui/material/styles' {
-  interface CustomPalette {
-    button: PaletteColorOptions;
-  }
-  interface Palette extends CustomPalette {}
-  interface PaletteOptions extends CustomPalette {}
-}
 
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
@@ -337,7 +329,7 @@ const Store = (props: IStoreProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     props.getStoreThunk({
       limit: rows,
@@ -477,14 +469,14 @@ const Store = (props: IStoreProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStoreList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -673,7 +665,7 @@ const Store = (props: IStoreProps): JSX.Element => {
                   <TableCell align="center">{store.address}</TableCell>
                   <TableCell align="center">
                     {store.isActive ? (
-                      <CheckIcon color="success" />
+                      <CheckIcon color="button" />
                     ) : (
                       <ClearIcon color="error" />
                     )}

@@ -48,13 +48,6 @@ import { EnumSort } from '../../utils/enums/enum.sort';
 import './Cloth.css';
 
 // declaring new color names
-declare module '@mui/material/styles' {
-  interface CustomPalette {
-    button: PaletteColorOptions;
-  }
-  interface Palette extends CustomPalette {}
-  interface PaletteOptions extends CustomPalette {}
-}
 
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {

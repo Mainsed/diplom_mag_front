@@ -21,7 +21,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -29,7 +29,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -37,7 +37,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -67,7 +67,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -75,7 +75,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -83,7 +83,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -113,7 +113,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -121,7 +121,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -129,7 +129,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -159,7 +159,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -167,7 +167,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -175,7 +175,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -205,7 +205,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -213,7 +213,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -221,7 +221,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -251,7 +251,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -259,7 +259,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -267,7 +267,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -297,7 +297,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -305,7 +305,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -313,7 +313,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -343,7 +343,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -351,7 +351,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -359,7 +359,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -389,7 +389,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -397,7 +397,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -405,7 +405,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -435,7 +435,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -443,7 +443,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -451,7 +451,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,
@@ -481,7 +481,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 2,
@@ -489,7 +489,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 3,
@@ -497,7 +497,7 @@ let delivery = [
           { size: ClothSizes.L, count: 10 },
           { size: ClothSizes.XL, count: 10 },
           { size: ClothSizes.S, count: 10 },
-        ]
+        ],
       },
       {
         clothId: 4,

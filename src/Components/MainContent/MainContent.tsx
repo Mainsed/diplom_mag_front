@@ -7,6 +7,8 @@ import ClothContainer from '../../Containers/ClothContainer';
 import OrderContainer from '../../Containers/OrderContainer';
 import StoreContainer from '../../Containers/StoreContainer';
 import DeliveryContainer from '../../Containers/DeliveryContainer';
+import ReportsContainer from '../../Containers/ReportsContainer';
+import AuthContainer from '../../Containers/AuthContainer';
 
 const MainContent = () =>
   <Box style={{ padding: '20px' }}>
@@ -17,6 +19,8 @@ const MainContent = () =>
       <Route path={'/orders'} element={<OrderContainer />} />
       <Route path={'/stores'} element={<StoreContainer />} />
       <Route path={'/delivery'} element={<DeliveryContainer />} />
+      <Route path={'/reports'} element={<ReportsContainer />} />
+      <Route path={'/auth'} element={<AuthContainer />} />
       <Route path="*" element={<Navigate to="/staff" />} />
     </Routes>
   </Box>;

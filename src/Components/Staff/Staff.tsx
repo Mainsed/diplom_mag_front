@@ -11,7 +11,6 @@ import {
   InputAdornment,
   Menu,
   MenuItem,
-  PaletteColorOptions,
   Paper,
   Switch,
   Table,
@@ -49,13 +48,6 @@ import {
 import { EnumSort } from '../../utils/enums/enum.sort';
 
 // declaring new color names
-declare module '@mui/material/styles' {
-  interface CustomPalette {
-    button: PaletteColorOptions;
-  }
-  interface Palette extends CustomPalette {}
-  interface PaletteOptions extends CustomPalette {}
-}
 
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
@@ -1037,7 +1029,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
                   <TableCell align="center">{staff.position}</TableCell>
                   <TableCell align="center">
                     {staff.isAdmin ? (
-                      <CheckIcon color="success" />
+                      <CheckIcon color="button" />
                     ) : (
                       <ClearIcon color="error" />
                     )}

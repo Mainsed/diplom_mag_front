@@ -1,0 +1,13 @@
+.reportPaper {
+  margin: 20px;
+  padding-bottom: 5px;
+}
+
+.reportPaperTitle{
+  padding: 20px;
+}
+
+.reportRow {
+  padding-top: 10px;
+  padding-bottom: 10px;
+}

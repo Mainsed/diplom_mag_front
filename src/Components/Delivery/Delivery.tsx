@@ -11,7 +11,6 @@ import {
   InputLabel,
   Menu,
   MenuItem,
-  PaletteColorOptions,
   Paper,
   Select,
   Table,
@@ -51,13 +50,6 @@ import { EnumSort } from '../../utils/enums/enum.sort';
 import './Delivery.css';
 
 // declaring new color names
-declare module '@mui/material/styles' {
-  interface CustomPalette {
-    button: PaletteColorOptions;
-  }
-  interface Palette extends CustomPalette {}
-  interface PaletteOptions extends CustomPalette {}
-}
 
 declare module '@mui/material/Button' {
   interface ButtonPropsColorOverrides {
@@ -118,7 +110,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
   });
 
   const [clothDeliverValidation, setClothDeliverValidation] = useState<
-    IClothDelivered[]
+  IClothDelivered[]
   >([
     {
       clothId: 0,
@@ -449,8 +441,8 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           const availableSizes = Object.values(ClothSizes).filter(
             (size) =>
               clothDeliver.sizes.findIndex(
-                (clothSize) => clothSize.size === size,
-              ) === -1,
+                (clothSize) => clothSize.size === size
+              ) === -1
           );
           return (
             <Grid item xs={4} key={i}>
@@ -566,7 +558,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     props.getDeliveryThunk({
       limit: rows,
@@ -603,7 +595,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const handleEditDelivery = () => {
     const DeliveryChanged = delivers.find(
-      (delivery) => delivery.id === parseInt(editValidation.id),
+      (delivery) => delivery.id === parseInt(editValidation.id)
     );
 
     if (!DeliveryChanged) {
@@ -741,7 +733,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           }
         }
         return clothDeliver;
-      }),
+      })
     );
   };
 
@@ -778,7 +770,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           };
         }
         return clothDeliver;
-      }),
+      })
     );
   };
 
@@ -789,12 +781,12 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           return {
             clothId: clothDeliver.clothId,
             sizes: clothDeliver.sizes.filter(
-              (clothSize) => clothSize.size !== size,
+              (clothSize) => clothSize.size !== size
             ),
           };
         }
         return clothDeliver;
-      }),
+      })
     );
   };
 
@@ -814,14 +806,14 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateDeliveryList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -1058,7 +1050,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                                     </Paper>
                                   </Grid>
                                 </Grid>
-                              ),
+                              )
                             )}
                           </Grid>
                         </Paper>
