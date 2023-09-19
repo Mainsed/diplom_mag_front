@@ -16,12 +16,16 @@ const App = (props: IAppProps) => {
   }, []);
 
   return (
-    <Grid container className="app">
+    <Grid container className="app" alignContent="baseline">
       <HeaderContainer />
       <Grid container className="mainElem" justifyContent={'center'}>
-        {props.auth?.isAuthorized === false ? <Navigate to="/auth" /> : <Grid item xs={4} sm={2.5} lg={1.3}>
-          <SideBarContainer />
-        </Grid>}
+        {props.auth?.isAuthorized === false ? (
+          <Navigate to="/auth" />
+        ) : (
+          <Grid item xs={4} sm={2.5} lg={1.3}>
+            <SideBarContainer />
+          </Grid>
+        )}
         <Grid item xs={8} sm={9.5} lg={10.7}>
           <MainContentContainer />
         </Grid>

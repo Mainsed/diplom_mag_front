@@ -1,6 +1,7 @@
 export interface IAuth {
   isAuthorized: boolean,
-  name: string,
+  name?: string,
+  error?: string,
 }
 
 export interface IAuthorize {

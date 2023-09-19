@@ -98,6 +98,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     isAdmin: false,
     password: '',
     position: '',
+    storeId: '',
   });
 
   const [editValidation, setEditValidation] = useState({
@@ -107,6 +108,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     isAdmin: false,
     password: '',
     position: '',
+    storeId: '',
   });
 
   const [filter, setFilter] = useState({
@@ -116,6 +118,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     isAdmin: false,
     isNotAdmin: false,
     position: '',
+    storeId: '',
   });
 
   const [adminValidation, setAdminValidation] = useState({
@@ -263,6 +266,18 @@ const Staff = (props: IStaffProps): JSX.Element => {
               errorMessages={['Мінімальна дозволена довжена - 2 символи']}
               className="formElem"
             />
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="ID магазину"
+              onChange={handleChangeCreateText}
+              name="storeId"
+              color="button"
+              value={storeId}
+              validators={['required']}
+              errorMessages={["Це поле обов'язкове"]}
+              className="formElem"
+            />
             <FormControlLabel
               value={isAdmin}
               onChange={handleChangeCreateText}
@@ -381,6 +396,18 @@ const Staff = (props: IStaffProps): JSX.Element => {
               value={editPosition}
               validators={['minStringLength:2']}
               errorMessages={['Мінімальна дозволена довжена - 2 символи']}
+              className="formElem"
+            />
+            <TextValidator
+              fullWidth
+              variant={'outlined'}
+              label="ID магазину"
+              onChange={handleEditAdminText}
+              name="storeId"
+              color="button"
+              value={editStoreId}
+              validators={['required']}
+              errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
             <FormControlLabel
@@ -584,7 +611,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
     let { isAdmin } = filter;
 
@@ -604,6 +631,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
         isAdmin,
         name: filter.name,
         position: filter.position,
+        storeId: parseInt(filter.storeId) || undefined,
       },
       sort: {
         order: orderString,
@@ -643,6 +671,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       name: createValidation.name,
       position: createValidation.position,
       password: createValidation.password,
+      storeId: parseInt(createValidation.storeId),
     } as IStaffCreate;
 
     props.createStaffThunk(createStaffData);
@@ -672,6 +701,10 @@ const Staff = (props: IStaffProps): JSX.Element => {
         editValidation.position !== staffChanged.position
           ? editValidation.position
           : undefined,
+      storeId:
+        parseInt(editValidation.storeId) !== staffChanged.storeId
+          ? parseInt(editValidation.storeId)
+          : undefined,
     } as IStaffUpdate;
 
     props.updateStaffThunk(editStaffData);
@@ -690,6 +723,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       isAdmin: false,
       password: '',
       position: '',
+      storeId: '',
     });
   };
 
@@ -701,6 +735,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       isAdmin: staff.isAdmin,
       password: staff.password,
       position: staff.position,
+      storeId: staff.storeId.toString(),
     });
     setEditOpen(true);
   };
@@ -714,6 +749,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       isAdmin: false,
       password: '',
       position: '',
+      storeId: '',
     });
   };
 
@@ -806,14 +842,14 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStaffList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
     updateStaffList(parseInt(event.target.value, 10), 0);
@@ -834,7 +870,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
     updateStaffList(pagination.rows, 0, orderString, property);
   };
 
-  const { email, isAdmin, name, password, position } = createValidation;
+  const { email, isAdmin, name, password, position, storeId } =
+    createValidation;
   const {
     password: adminPassword,
     id: adminId,
@@ -847,6 +884,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     name: editName,
     password: editPassword,
     position: editPosition,
+    storeId: editStoreId,
   } = editValidation;
 
   const {
@@ -856,6 +894,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     isNotAdmin: filterIsNotAdmin,
     name: filterName,
     position: filterPosition,
+    storeId: filterStoreId,
   } = filter;
 
   return (
@@ -899,6 +938,15 @@ const Staff = (props: IStaffProps): JSX.Element => {
                   onClick={handleSort('isAdmin')}
                 >
                   Чи є адміністратором
+                </TableSortLabel>
+              </TableCell>
+              <TableCell align="center">
+                <TableSortLabel
+                  active={orderBy === 'storeId'}
+                  direction={orderBy === 'storeId' ? order : 'asc'}
+                  onClick={handleSort('storeId')}
+                >
+                  ID магазину
                 </TableSortLabel>
               </TableCell>
               <TableCell align="center">Час останнього оновлення</TableCell>
@@ -977,6 +1025,15 @@ const Staff = (props: IStaffProps): JSX.Element => {
                       />
                       <TextField
                         fullWidth
+                        label="ID магазину"
+                        className="drawerFilterElem"
+                        value={filterStoreId}
+                        onChange={handleChangeFilterText}
+                        name="storeId"
+                        color="button"
+                      />
+                      <TextField
+                        fullWidth
                         label="Електронна пошта"
                         className="drawerFilterElem"
                         value={filterEmail}
@@ -1034,6 +1091,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
                       <ClearIcon color="error" />
                     )}
                   </TableCell>
+                  <TableCell align="center">{staff.storeId}</TableCell>
                   <TableCell align="center">{staff.updatedAt}</TableCell>
                   <TableCell align="center">{staff.updatedBy}</TableCell>
                   <TableCell align="center">
@@ -1063,10 +1121,6 @@ const Staff = (props: IStaffProps): JSX.Element => {
       </ThemeProvider>
     </TableContainer>
   );
-};
-
-Staff.propTypes = {
-  staff: PropTypes.array,
 };
 
 export default Staff;

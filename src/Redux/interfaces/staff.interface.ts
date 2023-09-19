@@ -7,6 +7,7 @@ export interface IStaff {
   isAdmin: boolean;
   password: string;
   position: string,
+  storeId: number;
   createdBy: string;
   createdAt: string;
   updatedBy: string;
@@ -33,6 +34,7 @@ export interface IStaffCreate {
   position: string,
   isAdmin: boolean;
   password?: string;
+  storeId: number;
 }
 
 export interface IStaffUpdate {
@@ -42,6 +44,7 @@ export interface IStaffUpdate {
   position?: string,
   isAdmin?: boolean;
   password?: string;
+  storeId?: number;
 }
 
 export interface IStaffDelete {
@@ -54,6 +57,7 @@ export interface IStaffGetFilter {
   email?: string;
   position?: string,
   isAdmin?: boolean;
+  storeId?: number;
 }
 
 export interface IStaffGet {

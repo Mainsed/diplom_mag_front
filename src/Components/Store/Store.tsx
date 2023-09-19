@@ -36,7 +36,6 @@ import {
   Clear as ClearIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-import PropTypes from 'prop-types';
 import {
   ClothSizes,
   IStore,
@@ -697,10 +696,6 @@ const Store = (props: IStoreProps): JSX.Element => {
       </ThemeProvider>
     </TableContainer>
   );
-};
-
-Store.propTypes = {
-  store: PropTypes.array,
 };
 
 export default Store;

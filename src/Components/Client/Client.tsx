@@ -33,7 +33,6 @@ import {
   FilterAlt as FilterAltIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-import PropTypes from 'prop-types';
 import {
   ClothSizes,
   IClient,
@@ -818,10 +817,6 @@ const Client = (props: IClientProps): JSX.Element => {
       </ThemeProvider>
     </TableContainer>
   );
-};
-
-Client.propTypes = {
-  client: PropTypes.array,
 };
 
 export default Client;

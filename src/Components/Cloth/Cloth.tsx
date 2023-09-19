@@ -11,7 +11,6 @@ import {
   InputLabel,
   Menu,
   MenuItem,
-  PaletteColorOptions,
   Paper,
   Select,
   Table,
@@ -36,7 +35,6 @@ import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-import PropTypes from 'prop-types';
 import {
   ClothSizes,
   ICloth,
@@ -873,11 +871,6 @@ const Cloth = (props: IClothProps): JSX.Element => {
       </ThemeProvider>
     </TableContainer>
   );
-};
-
-Cloth.propTypes = {
-  cloth: PropTypes.any,
-  getClothSizesThunk: PropTypes.any,
 };
 
 export default Cloth;

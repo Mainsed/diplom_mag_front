@@ -3,6 +3,7 @@
   border-bottom: black 1px solid;
   color: white;
   height: fit-content;
+  padding: 5px;
 }
 .headerElem {
   height: fit-content;

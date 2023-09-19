@@ -9,8 +9,9 @@ import {
 import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import './Header.css';
+import { IHeaderProps } from '../../Redux/interfaces/header.interface';
 
-const Header = (): JSX.Element => {
+const Header = (props: IHeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -38,23 +39,27 @@ const Header = (): JSX.Element => {
         </Typography>
       </Grid>
       <Grid item xs={3} className="headerElem">
-        <Grid container justifyContent={'flex-end'}>
-          <Button onClick={handleClick}>
-            <Avatar alt="Person img">U</Avatar>
-          </Button>
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-            disableScrollLock={true}
-          >
-            <MenuItem onClick={handleClose}>Вийти</MenuItem>
-          </Menu>
-        </Grid>
+        {props.isAuthorized ? (
+          <Grid container justifyContent={'flex-end'}>
+            <Button onClick={handleClick}>
+              <Avatar alt="Person img">U</Avatar>
+            </Button>
+            <Menu
+              id="basic-menu"
+              anchorEl={anchorEl}
+              open={open}
+              onClose={handleClose}
+              MenuListProps={{
+                'aria-labelledby': 'basic-button',
+              }}
+              disableScrollLock={true}
+            >
+              <MenuItem onClick={handleClose}>Вийти</MenuItem>
+            </Menu>
+          </Grid>
+        ) : (
+          ''
+        )}
       </Grid>
     </Grid>
   );
