@@ -7,7 +7,7 @@ const MainContentContainer = (props: any) => {
   return <MainContent {...props} />;
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
   return {};
 };
 export default connect(mapStateToProps, {})(MainContentContainer);

@@ -38,7 +38,6 @@ import {
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import './Staff.css';
-import PropTypes from 'prop-types';
 import {
   IStaff,
   IStaffCreate,
@@ -611,7 +610,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     let { isAdmin } = filter;
 
@@ -842,14 +841,14 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStaffList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
     updateStaffList(parseInt(event.target.value, 10), 0);

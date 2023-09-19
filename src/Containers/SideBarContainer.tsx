@@ -7,7 +7,7 @@ const SideBarContainer = (props: any) => {
   return <SideBar {...props} />;
 };
 
-const mapStateToProps = (state: any) => {
+const mapStateToProps = () => {
   return {};
 };
 

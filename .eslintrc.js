@@ -131,6 +131,5 @@ module.exports = {
       { allow: ['arrowFunctions'] },
     ],
     'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
   },
 };

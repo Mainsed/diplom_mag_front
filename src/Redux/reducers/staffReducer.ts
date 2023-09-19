@@ -65,7 +65,7 @@ export const getStaffThunk = (staffData: IStaffGet) => async (dispatch: Dispatch
   dispatch({ type: GET_STAFF, data: staffResp });
 };
 
-export const createStaffThunk = (staffToCreate: IStaffCreate) => async (dispatch: Dispatch<ActionTypes>) => {
+export const createStaffThunk = (staffToCreate: IStaffCreate) => async () => {
   await StaffApi.createStaff(staffToCreate);
 };
 
