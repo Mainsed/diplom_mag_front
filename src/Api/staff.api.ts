@@ -1,6 +1,14 @@
 import { instance } from './axios.instance';
-import { IStaff, IStaffCreate, IStaffDelete, IStaffGet, IStaffState, IStaffUpdate } from '../Redux/interfaces';
-import { EnumSort } from '../utils/enums/enum.sort';
+import {
+  IStaff,
+  IStaffCreate,
+  IStaffDelete,
+  IStaffError,
+  IStaffGet,
+  IStaffState,
+  IStaffUpdate,
+} from '../Redux/interfaces';
+import { AxiosError } from 'axios';
 
 let staff = [
   {
@@ -174,48 +182,51 @@ let staff = [
 ] as IStaff[];
 
 export const StaffApi = {
-  getAllStaff: (staffData: IStaffGet): Promise<IStaffState> | IStaffState => {
-    const startIndex = (staffData?.page || 0) * (staffData?.limit || 10);
-
-    let staffSorted = [] as IStaff[];
-    if (staffData?.sort?.orderBy) {
-      type propType = keyof typeof staff[0]
-      const property = staffData.sort.orderBy as propType;
-      staffSorted = staff.sort((a, b) => {
-        if (staffData.sort?.order === EnumSort.asc) {
-          return a[property] > b[property] ? 1 : -1;
-        } else {
-          return a[property] < b[property] ? 1 : -1;
-        }
-      });
+  getAllStaff: async (staffData: IStaffGet): Promise<IStaffState | IStaffError> => {
+    if (staffData === undefined) {
+      return [] as any;
     }
 
-    const resp = (staffSorted.length === staff.length ? staffSorted : staff)
-      .slice(startIndex, startIndex + (staffData?.limit || 10));
-
-    return { staff: resp, staffCount: staff.length };
+    try {
+      const { filter, limit, page, sort } = staffData;
+      const staff = (
+        await instance.get<IStaffState>(
+          'staff', {
+            params: {
+              limit: limit,
+              page: page,
+              order: sort?.order,
+              orderBy: sort?.orderBy,
+              email: filter?.email,
+              id: filter?.id,
+              isAdmin: filter?.isAdmin,
+              name: filter?.name,
+              position: filter?.position,
+              storeId: filter?.storeId,
+            },
+          }
+        )
+      ).data;
+      return staff;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.message };
+    }
   },
 
-  createStaff: (staffData: IStaffCreate): Promise<IStaff> | IStaff => {
-    // throw Error('Not implemented');
-    // return instance.post('staff', staffData)
-    const newStaff = {
-      ...staffData,
-      password: staffData.password || '',
-      createdAt: '',
-      createdBy: '',
-      deletedBy: '',
-      id: staff[staff.length - 1].id + 1,
-      updatedAt:
-        'updatedAt',
-      updatedBy: 'updatedBy',
-    };
+  createStaff: async (staffData: IStaffCreate): Promise<IStaff | IStaffError> => {
+    try {
+      const newStaff = (await instance.post('staff', staffData)).data;
 
-    staff.push(newStaff);
-    return newStaff;
+      staff.push(newStaff);
+      return newStaff;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.response?.message?.toString() || error.response?.data?.message };
+    }
   },
 
-  updateStaff: (staffData: IStaffUpdate): Promise<IStaff> | IStaff => {
+  updateStaff: (staffData: IStaffUpdate): Promise<IStaff | IStaffError> | IStaff => {
     const existingStaff = staff.find((staff) => staff.id === staffData.id);
     if (!existingStaff) {
       throw Error('Staff not found');
@@ -245,7 +256,7 @@ export const StaffApi = {
     return updatedStaff;
   },
 
-  deleteStaff: (staffData: IStaffDelete): Promise<number> | number => {
+  deleteStaff: (staffData: IStaffDelete): Promise<number | IStaffError> | number => {
     staff = staff.filter((staff) => staff.id !== staffData.id);
     return staffData.id;
   },

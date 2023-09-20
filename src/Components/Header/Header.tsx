@@ -18,6 +18,7 @@ const Header = (props: IHeaderProps) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
+    props.logoutThunk();
     setAnchorEl(null);
   };
 
@@ -42,7 +43,7 @@ const Header = (props: IHeaderProps) => {
         {props.isAuthorized ? (
           <Grid container justifyContent={'flex-end'}>
             <Button onClick={handleClick}>
-              <Avatar alt="Person img">U</Avatar>
+              <Avatar alt="Person img">{props.name && props.name[0]}</Avatar>
             </Button>
             <Menu
               id="basic-menu"

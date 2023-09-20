@@ -84,8 +84,25 @@ const theme = createTheme({
 });
 
 const Staff = (props: IStaffProps): JSX.Element => {
+  const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
+  const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
+  const [orderBy, setOrderBy] = React.useState('id');
+
   useEffect(() => {
-    props.getStaffThunk();
+    props.getStaffThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
+    ValidatorForm.addValidationRule('isPassword', (value) => {
+      if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+        return true;
+      }
+      return false;
+    });
   }, []);
 
   const staff = props.staff.staff || [];
@@ -142,10 +159,6 @@ const Staff = (props: IStaffProps): JSX.Element => {
   const [makeAdminDialogOpen, setMakeAdminOpen] = React.useState(false);
   const [removeAdminDialogOpen, setRemoveAdminOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
-  const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
-
-  const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
-  const [orderBy, setOrderBy] = React.useState('id');
 
   const IsolatedMenu = (staff: IStaff) => {
     const menuOpen = Boolean(anchorEl);
@@ -296,8 +309,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 color="button"
                 type={showPassword ? 'text' : 'password'}
                 value={password}
-                validators={['minStringLength:8']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів']}
+                validators={['isPassword']}
+                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
                 className="formElem"
                 InputProps={{
                   // <-- This is where the toggle button is added.
@@ -428,8 +441,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 color="button"
                 type={showPassword ? 'text' : 'password'}
                 value={editPassword}
-                validators={['minStringLength:8']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів']}
+                validators={['isPassword']}
+                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
                 className="formElem"
               />
             ) : (
@@ -562,8 +575,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
               color="button"
               type={showPassword ? 'text' : 'password'}
               value={password}
-              validators={['minStringLength:8']}
-              errorMessages={['Мінімальна довжина паролю - 8 символів']}
+              validators={['isPassword']}
+              errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
               className="formElem"
               InputProps={{
                 // <-- This is where the toggle button is added.
@@ -625,11 +638,11 @@ const Staff = (props: IStaffProps): JSX.Element => {
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
+        id: parseInt(filter.id) || undefined,
+        email: filter.email || undefined,
         isAdmin,
-        name: filter.name,
-        position: filter.position,
+        name: filter.name || undefined,
+        position: filter.position || undefined,
         storeId: parseInt(filter.storeId) || undefined,
       },
       sort: {
@@ -663,17 +676,20 @@ const Staff = (props: IStaffProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateStaff = () => {
+  const handleCreateStaff = async () => {
     const createStaffData = {
       email: createValidation.email,
       isAdmin: createValidation.isAdmin,
       name: createValidation.name,
       position: createValidation.position,
-      password: createValidation.password,
+      password:
+        createValidation.password !== ''
+          ? createValidation.password
+          : undefined,
       storeId: parseInt(createValidation.storeId),
     } as IStaffCreate;
 
-    props.createStaffThunk(createStaffData);
+    await props.createStaffThunk(createStaffData);
     updateStaffList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };

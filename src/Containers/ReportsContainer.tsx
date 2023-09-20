@@ -12,7 +12,6 @@ const ReportsContainer = (props: any) => {
 };
 
 const mapStateToProps = (state: IState): Partial<IReportsProps> => {
-  console.log(state);
   return {
     reports: state.reports,
   };

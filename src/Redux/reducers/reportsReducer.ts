@@ -27,7 +27,6 @@ type GetReportsActionType = {
 // thunks
 export const getReportsThunk = () => async (dispatch: Dispatch<ActionTypes>) => {
   const reportsResp = await ReportsApi.getReports();
-  console.log(reportsResp);
   dispatch({ type: GET_REPORTS, data: reportsResp });
 };
 

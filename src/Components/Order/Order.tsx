@@ -84,7 +84,6 @@ const Order = (props: IOrderProps): JSX.Element => {
   }, []);
   const orders = props.order?.order || [];
   const orderCount = props.order?.orderCount || 0;
-  console.log(orders);
 
   const [createValidation, setCreateValidation] = useState({
     clientId: '',

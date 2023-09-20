@@ -18,11 +18,16 @@ export interface IStaff {
 export interface IStaffState {
   staff: IStaff[],
   staffCount: number,
+  staffError?: string,
+}
+
+export interface IStaffError {
+  error: string,
 }
 
 export interface IStaffProps {
   staff: IStaffState,
-  getStaffThunk(staffGetData?: IStaffGet): void,
+  getStaffThunk(staffGetData: IStaffGet): void,
   updateStaffThunk(staffToUpdate: IStaffUpdate): void,
   createStaffThunk(staffToCreate: IStaffCreate): void,
   deleteStaffThunk(staffToDelete: IStaffDelete): void,
@@ -61,8 +66,8 @@ export interface IStaffGetFilter {
 }
 
 export interface IStaffGet {
-  limit?: number;
-  page?: number;
+  limit: number;
+  page: number;
   filter?: IStaffGetFilter,
   sort?: IGetSort,
 }

@@ -8,7 +8,7 @@ import {
   Typography,
   createTheme,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IAuthProps } from '../../Redux/interfaces';
 import './Auth.css';
 import { TextValidator, ValidatorForm } from 'react-material-ui-form-validator';
@@ -30,6 +30,14 @@ const theme = createTheme({
 });
 
 const Auth = (props: IAuthProps): JSX.Element => {
+  useEffect(() => {
+    ValidatorForm.addValidationRule('isPassword', (value) => {
+      if (/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/.test(value)) {
+        return true;
+      }
+      return false;
+    });
+  }, []);
   const [authValidation, setAuthValidation] = useState({
     login: '',
     password: '',
@@ -49,7 +57,7 @@ const Auth = (props: IAuthProps): JSX.Element => {
   };
 
   const handleLogin = () => {
-    props.authorizeThunk({ nameOrEmail: login, password });
+    props.authorizeThunk({ email: login, password });
   };
 
   const { login, password } = authValidation;
@@ -88,8 +96,8 @@ const Auth = (props: IAuthProps): JSX.Element => {
               color="button"
               type={showPassword ? 'text' : 'password'}
               value={password}
-              validators={['minStringLength:8']}
-              errorMessages={['Мінімальна довжина паролю - 8 символів']}
+              validators={['isPassword']}
+              errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
               className="formElem"
               InputProps={{
                 endAdornment: (
@@ -119,18 +127,6 @@ const Auth = (props: IAuthProps): JSX.Element => {
               </Button>
             </Grid>
           </ValidatorForm>
-          {props.auth?.auth?.error ? (
-            <Typography
-              align="center"
-              color="error"
-              className="authErrorText"
-              fontWeight="bold"
-            >
-              {props.auth.auth.error}
-            </Typography>
-          ) : (
-            ''
-          )}
         </Paper>
       </Grid>
     </ThemeProvider>

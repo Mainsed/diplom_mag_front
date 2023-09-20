@@ -4,8 +4,12 @@ export interface IAuth {
   error?: string,
 }
 
+export interface ILogout {
+  error?: string,
+}
+
 export interface IAuthorize {
-  nameOrEmail: string,
+  email: string,
   password: string,
 }
 

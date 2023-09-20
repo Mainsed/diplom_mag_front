@@ -7,13 +7,26 @@ import MainContentContainer from './Containers/MainContentContainer';
 import { IAppProps } from './Redux/interfaces';
 import Cookies from 'js-cookie';
 import { Navigate } from 'react-router-dom';
+import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 
 const App = (props: IAppProps) => {
   useEffect(() => {
-    const isAuthorized = Cookies.get('username');
+    const isAuthorized = Cookies.get('isAuthorized');
 
     props.setAuthorized(isAuthorized === 'true');
   }, []);
+
+  useEffect(() => {
+    props.errors.forEach((error) => {
+      enqueueSnackbar(error, {
+        variant: 'error',
+        autoHideDuration: 5000,
+        anchorOrigin: { vertical: 'top', horizontal: 'right' },
+      });
+    });
+    props.clearAuthError();
+    props.clearStaffError();
+  }, [props.errors]);
 
   return (
     <Grid container className="app" alignContent="baseline">
@@ -30,6 +43,7 @@ const App = (props: IAppProps) => {
           <MainContentContainer />
         </Grid>
       </Grid>
+      <SnackbarProvider maxSnack={10}/>
     </Grid>
   );
 };
