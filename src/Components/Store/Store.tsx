@@ -488,6 +488,10 @@ const Store = (props: IStoreProps): JSX.Element => {
     updateStoreList(pagination.rows, 0);
   };
 
+  const handleClearFilterStore = () => {
+    setFilter({ id: '', address: '', isActive: false });
+  };
+
   const handleSort = (property: string) => () => {
     const orderString =
       orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
@@ -571,14 +575,14 @@ const Store = (props: IStoreProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -643,13 +647,28 @@ const Store = (props: IStoreProps): JSX.Element => {
                         </Select>
                       </FormControl>
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterStore}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterStore}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterStore}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>

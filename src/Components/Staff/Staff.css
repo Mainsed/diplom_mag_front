@@ -37,3 +37,7 @@
 .drawerFilterTitle {
   margin-bottom: 40px !important;
 }
+
+.filterButton {
+  height: fit-content;
+}

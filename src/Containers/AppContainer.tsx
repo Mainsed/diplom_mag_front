@@ -11,7 +11,6 @@ const AppContainer = (props: any) => {
 
 const mapStateToProps = (state: IState): Partial<IAppProps> => {
   const stateErrors = [state.auth?.auth?.error, state.staff.staffError];
-  console.log(stateErrors, state);
 
   const errors = stateErrors.filter(
     (error) => typeof error === 'string'

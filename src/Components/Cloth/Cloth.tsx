@@ -589,6 +589,16 @@ const Cloth = (props: IClothProps): JSX.Element => {
     updateClothList(pagination.rows, 0);
   };
 
+  const handleClearFilterCloth = () => {
+    setFilter({
+      id: '',
+      availableSizes: [] as ClothSizes[],
+      name: '',
+      desc: '',
+      price: '',
+    });
+  };
+
   const handleSort = (property: string) => () => {
     const orderString =
       orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
@@ -682,14 +692,14 @@ const Cloth = (props: IClothProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -759,13 +769,28 @@ const Cloth = (props: IClothProps): JSX.Element => {
                         </Select>
                       </FormControl>
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterCloth}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterCloth}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterCloth}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>

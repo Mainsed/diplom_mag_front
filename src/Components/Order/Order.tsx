@@ -584,6 +584,15 @@ const Order = (props: IOrderProps): JSX.Element => {
     updateOrderList(pagination.rows, 0);
   };
 
+  const handleClearFilterOrder = () => {
+    setFilter({
+      id: '',
+      clientId: '',
+      clothIdList: [] as string[],
+      status: '' as OrderStatuses,
+    });
+  };
+
   const handleSort = (property: string) => () => {
     const orderString =
       orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
@@ -690,14 +699,14 @@ const Order = (props: IOrderProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -748,13 +757,28 @@ const Order = (props: IOrderProps): JSX.Element => {
                         color="button"
                       />
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterOrder}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterOrder}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterOrder}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>

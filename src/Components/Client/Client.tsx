@@ -586,6 +586,16 @@ const Client = (props: IClientProps): JSX.Element => {
     updateClientList(pagination.rows, 0);
   };
 
+  const handleClearFilterClient = () => {
+    setFilter({
+      id: '',
+      email: '',
+      name: '',
+      phoneNumber: '',
+      size: '',
+    });
+  };
+
   const handleSort = (property: string) => () => {
     const orderString =
       orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
@@ -678,14 +688,14 @@ const Client = (props: IClientProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -768,13 +778,28 @@ const Client = (props: IClientProps): JSX.Element => {
                         </Select>
                       </FormControl>
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterClient}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterClient}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterClient}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>

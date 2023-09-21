@@ -492,7 +492,8 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                         onChange={handleClothDeliverChange(i)}
                         validators={['required']}
                         errorMessages={["Це поле обов'язкове"]}
-                      /> шт.
+                      />{' '}
+                      шт.
                       <IconButton
                         onClick={handleRemoveClothDeliverSize(i, size.size)}
                       >
@@ -826,6 +827,10 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     updateDeliveryList(pagination.rows, 0);
   };
 
+  const handleClearFilterDelivery = () => {
+    setFilter({ id: '', deliveredTo: '', deliveredFrom: '' });
+  };
+
   const handleSort = (property: string) => () => {
     const orderString =
       orderBy === property && order === 'asc' ? EnumSort.desc : EnumSort.asc;
@@ -918,14 +923,14 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -963,13 +968,28 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                         color="button"
                       />
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterDelivery}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterDelivery}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterDelivery}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>

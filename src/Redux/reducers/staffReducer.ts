@@ -1,20 +1,14 @@
 import { Dispatch } from 'redux';
-import { IStaff, IStaffCreate, IStaffDelete, IStaffGet, IStaffState, IStaffUpdate } from '../interfaces';
+import { IStaffCreate, IStaffDelete, IStaffGet, IStaffState, IStaffUpdate } from '../interfaces';
 import { StaffApi } from '../../Api/staff.api';
 
 const initialState = {} as IStaffState;
 
 const CLEAR_ERROR = 'CLEAR_ERROR',
-  CREATE_STAFF = 'CREATE_STAFF',
-  DELETE_STAFF = 'DELETE_STAFF',
   GET_STAFF = 'GET_STAFF',
-  SET_ERROR = 'SET_ERROR',
-  UPDATE_STAFF = 'UPDATE_STAFF';
+  SET_ERROR = 'SET_ERROR';
 
 export type ActionTypes = GetStaffActionType
-| UpdateStaffActionType
-| CreateStaffActionType
-| DeleteStaffActionType
 | SetErrorActionType
 | ClearErrorActionType
 
@@ -22,22 +16,6 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
   switch (action.type) {
     case GET_STAFF: {
       return action.data;
-    }
-
-    case DELETE_STAFF: {
-      const newState = { ...state };
-      const newStaff = newState.staff.filter((staff) => staff.id !== action.data);
-      return { ...newState, staff: newStaff };
-    }
-
-    case UPDATE_STAFF: {
-      const newStaff = state.staff.map((staff) => {
-        if (staff.id === action.data.id) {
-          staff = action.data;
-        }
-        return staff;
-      });
-      return { ...state, staff: newStaff };
     }
 
     case CLEAR_ERROR: {
@@ -48,7 +26,6 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
     }
 
     case SET_ERROR: {
-      console.log('set error', action.data);
       return { ...state, staffError: action.data };
     }
 
@@ -60,21 +37,6 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
 type GetStaffActionType = {
   type: typeof GET_STAFF;
   data: IStaffState;
-}
-
-type CreateStaffActionType = {
-  type: typeof CREATE_STAFF;
-  data: IStaff;
-}
-
-type UpdateStaffActionType = {
-  type: typeof UPDATE_STAFF;
-  data: IStaff;
-}
-
-type DeleteStaffActionType = {
-  type: typeof DELETE_STAFF;
-  data: number;
 }
 
 type SetErrorActionType = {
@@ -117,10 +79,7 @@ export const updateStaffThunk = (staffToUpdate: IStaffUpdate) => async (dispatch
 
   if ('error' in staff) {
     dispatch({ type: SET_ERROR, data: staff.error });
-    return;
   }
-
-  dispatch({ type: UPDATE_STAFF, data: staff });
 };
 
 export const deleteStaffThunk = (staffToDelete: IStaffDelete) => async (dispatch: Dispatch<ActionTypes>) => {
@@ -128,10 +87,7 @@ export const deleteStaffThunk = (staffToDelete: IStaffDelete) => async (dispatch
 
   if (typeof staff === 'object') {
     dispatch({ type: SET_ERROR, data: staff.error });
-    return;
   }
-
-  dispatch({ type: DELETE_STAFF, data: staff });
 };
 
 export default staffReducer;

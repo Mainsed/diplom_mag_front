@@ -652,8 +652,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
     });
   };
 
-  const handleMakeAdmin = (adminId: number) => () => {
-    props.updateStaffThunk({
+  const handleMakeAdmin = (adminId: number) => async () => {
+    await props.updateStaffThunk({
       id: adminId,
       isAdmin: true,
       password: adminValidation.password,
@@ -662,8 +662,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
     handleMakeAdminDialogClose();
   };
 
-  const handleRemoveAdmin = (adminId: number) => () => {
-    props.updateStaffThunk({ id: adminId, isAdmin: false });
+  const handleRemoveAdmin = (adminId: number) => async () => {
+    await props.updateStaffThunk({ id: adminId, isAdmin: false });
     updateStaffList(pagination.rows, pagination.page);
     handleRemoveAdminDialogClose();
   };
@@ -694,7 +694,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     handleCreateDialogClose();
   };
 
-  const handleEditStaff = () => {
+  const handleEditStaff = async () => {
     const staffChanged = staff.find((staff) => staff.id === editValidation.id);
 
     if (!staffChanged) {
@@ -722,7 +722,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
           : undefined,
     } as IStaffUpdate;
 
-    props.updateStaffThunk(editStaffData);
+    await props.updateStaffThunk(editStaffData);
+    updateStaffList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
 
@@ -778,8 +779,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
     setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleDeleteStaff = (id: number) => () => {
-    props.deleteStaffThunk({ id });
+  const handleDeleteStaff = (id: number) => async () => {
+    await props.deleteStaffThunk({ id });
     updateStaffList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
@@ -874,6 +875,18 @@ const Staff = (props: IStaffProps): JSX.Element => {
     setPagination({ ...pagination, page: 0 });
     updateStaffList(pagination.rows, 0);
     handleDrawerOpenToggle();
+  };
+
+  const handleClearFilterStaff = () => {
+    setFilter({
+      id: '',
+      email: '',
+      name: '',
+      isAdmin: false,
+      isNotAdmin: false,
+      position: '',
+      storeId: '',
+    });
   };
 
   const handleSort = (property: string) => () => {
@@ -994,14 +1007,14 @@ const Staff = (props: IStaffProps): JSX.Element => {
                   open={showDrawer}
                   onClose={handleDrawerOpenToggle}
                   PaperProps={{
-                    sx: { width: '20%' },
+                    sx: { width: '25%' },
                   }}
                 >
                   <Grid
                     container
-                    direction="column"
                     justifyContent="space-between"
                     className="drawerContainer"
+                    alignContent="space-evenly"
                   >
                     <div>
                       <Typography
@@ -1078,13 +1091,28 @@ const Staff = (props: IStaffProps): JSX.Element => {
                         className="formElem"
                       />
                     </div>
-                    <Button
-                      color="button"
-                      variant="contained"
-                      onClick={handleFilterStaff}
+                    <Grid
+                      container
+                      justifyContent="space-evenly"
+                      alignContent="center"
                     >
-                      Застосувати
-                    </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleFilterStaff}
+                        className="filterButton"
+                      >
+                        Застосувати
+                      </Button>
+                      <Button
+                        color="button"
+                        variant="contained"
+                        onClick={handleClearFilterStaff}
+                        className="filterButton"
+                      >
+                        Очистити
+                      </Button>
+                    </Grid>
                   </Grid>
                 </Drawer>
               </TableCell>
