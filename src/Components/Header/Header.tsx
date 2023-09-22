@@ -17,8 +17,11 @@ const Header = (props: IHeaderProps) => {
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
-  const handleClose = () => {
+  const handleLogout = () => {
     props.logoutThunk();
+    handleClose();
+  };
+  const handleClose = () => {
     setAnchorEl(null);
   };
 
@@ -31,7 +34,7 @@ const Header = (props: IHeaderProps) => {
     >
       <Grid item xs={3} className="headerElem">
         <NavLink to={'/'}>
-          <img src="" alt="Logo" />
+          <img src="favicon.ico" alt="Logo" className="logo" />
         </NavLink>
       </Grid>
       <Grid item xs={3} className="headerElem">
@@ -55,7 +58,7 @@ const Header = (props: IHeaderProps) => {
               }}
               disableScrollLock={true}
             >
-              <MenuItem onClick={handleClose}>Вийти</MenuItem>
+              <MenuItem onClick={handleLogout}>Вийти</MenuItem>
             </Menu>
           </Grid>
         ) : (

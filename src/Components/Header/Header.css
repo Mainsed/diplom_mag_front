@@ -8,3 +8,7 @@
 .headerElem {
   height: fit-content;
 }
+
+.logo {
+  width: 50px;
+}

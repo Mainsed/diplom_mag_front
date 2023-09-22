@@ -1,15 +1,14 @@
 import { Dispatch } from 'redux';
-import { IClient, IClientCreate, IClientDelete, IClientGet, IClientState, IClientUpdate } from '../interfaces';
+import { IClientCreate, IClientDelete, IClientGet, IClientState, IClientUpdate } from '../interfaces';
 import { ClientApi } from '../../Api/client.api';
 
 const initialState = {} as IClientState;
 
-const CREATE_CLIENT = 'CREATE_CLIENT',
-  DELETE_CLIENT = 'DELETE_CLIENT',
+const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_CLIENT = 'GET_CLIENT',
-  UPDATE_CLIENT = 'UPDATE_CLIENT';
+  SET_ERROR = 'SET_ERROR';
 
-export type ActionTypes = GetClientActionType | UpdateClientActionType | CreateClientActionType | DeleteClientActionType
+export type ActionTypes = GetClientActionType | SetErrorActionType | ClearErrorActionType
 
 const clientReducer = (state = initialState, action: ActionTypes): IClientState => {
   switch (action.type) {
@@ -17,26 +16,15 @@ const clientReducer = (state = initialState, action: ActionTypes): IClientState 
       return action.data;
     }
 
-    case CREATE_CLIENT: {
-      const newState = { ...state };
-      newState.client.push(action.data);
-      return newState;
+    case CLEAR_ERROR: {
+      if (state.clientError === undefined) {
+        return state;
+      }
+      return { ...state, clientError: undefined };
     }
 
-    case DELETE_CLIENT: {
-      const newState = { ...state };
-      const newClient = newState.client.filter((client) => client.id !== action.data);
-      return { ...newState, client: newClient };
-    }
-
-    case UPDATE_CLIENT: {
-      const newClient = state.client.map((client) => {
-        if (client.id === action.data.id) {
-          client = action.data;
-        }
-        return client;
-      });
-      return { ...state, client: newClient };
+    case SET_ERROR: {
+      return { ...state, clientError: action.data };
     }
 
     default:
@@ -49,24 +37,25 @@ type GetClientActionType = {
   data: IClientState
 }
 
-type CreateClientActionType = {
-  type: typeof CREATE_CLIENT;
-  data: IClient
+type SetErrorActionType = {
+  type: typeof SET_ERROR;
+  data: string;
 }
 
-type UpdateClientActionType = {
-  type: typeof UPDATE_CLIENT;
-  data: IClient
-}
-
-type DeleteClientActionType = {
-  type: typeof DELETE_CLIENT;
-  data: number
+type ClearErrorActionType = {
+  type: typeof CLEAR_ERROR;
+  data: undefined;
 }
 
 // thunks
 export const getClientThunk = (clientData: IClientGet) => async (dispatch: Dispatch<ActionTypes>) => {
+  console.log('123');
   const clientResp = await ClientApi.getAllClient(clientData);
+  console.log(clientResp);
+  if ('error' in clientResp) {
+    dispatch({ type: SET_ERROR, data: clientResp.error });
+    return;
+  }
 
   dispatch({ type: GET_CLIENT, data: clientResp });
 };
@@ -74,19 +63,25 @@ export const getClientThunk = (clientData: IClientGet) => async (dispatch: Dispa
 export const createClientThunk = (clientToCreate: IClientCreate) => async (dispatch: Dispatch<ActionTypes>) => {
   const client = await ClientApi.createClient(clientToCreate);
 
-  dispatch({ type: CREATE_CLIENT, data: client });
+  if ('error' in client) {
+    dispatch({ type: SET_ERROR, data: client.error });
+  }
 };
 
 export const updateClientThunk = (clientToUpdate: IClientUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
   const client = await ClientApi.updateClient(clientToUpdate);
 
-  dispatch({ type: UPDATE_CLIENT, data: client });
+  if ('error' in client) {
+    dispatch({ type: SET_ERROR, data: client.error });
+  }
 };
 
 export const deleteClientThunk = (clientToDelete: IClientDelete) => async (dispatch: Dispatch<ActionTypes>) => {
   const client = await ClientApi.deleteClient(clientToDelete);
 
-  dispatch({ type: DELETE_CLIENT, data: client });
+  if (typeof client === 'object') {
+    dispatch({ type: SET_ERROR, data: client.error });
+  }
 };
 
 export default clientReducer;

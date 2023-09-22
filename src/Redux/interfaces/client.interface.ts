@@ -25,6 +25,11 @@ export interface IClient {
 export interface IClientState {
   client: IClient[],
   clientCount: number,
+  clientError?: string,
+}
+
+export interface IClientError {
+  error: string,
 }
 
 export interface IClientProps {

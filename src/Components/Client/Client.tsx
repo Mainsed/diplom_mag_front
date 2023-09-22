@@ -88,7 +88,14 @@ const theme = createTheme({
 
 const Client = (props: IClientProps): JSX.Element => {
   useEffect(() => {
-    props.getClientThunk();
+    props.getClientThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
   }, []);
 
   const clients = props.client?.client || [];
@@ -98,7 +105,7 @@ const Client = (props: IClientProps): JSX.Element => {
     email: '',
     name: '',
     phoneNumber: '',
-    size: '',
+    size: ClothSizes.XS,
   });
 
   const [editValidation, setEditValidation] = useState({
@@ -426,11 +433,11 @@ const Client = (props: IClientProps): JSX.Element => {
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        email: filter.email,
-        name: filter.name,
-        phoneNumber: filter.phoneNumber,
-        size: filter.size as ClothSizes,
+        id: parseInt(filter.id) || undefined,
+        email: filter.email || undefined,
+        name: filter.name || undefined,
+        phoneNumber: filter.phoneNumber || undefined,
+        size: (filter.size as ClothSizes) || undefined,
       },
       sort: {
         order: orderString,
@@ -443,7 +450,7 @@ const Client = (props: IClientProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateClient = () => {
+  const handleCreateClient = async () => {
     const createClientData = {
       email: createValidation.email,
       name: createValidation.name,
@@ -451,12 +458,12 @@ const Client = (props: IClientProps): JSX.Element => {
       size: createValidation.size,
     } as IClientCreate;
 
-    props.createClientThunk(createClientData);
-    updateClientList(pagination.rows, pagination.page);
+    await props.createClientThunk(createClientData);
+    await updateClientList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
-  const handleEditClient = () => {
+  const handleEditClient = async () => {
     const ClientChanged = clients.find(
       (client) => client.id === editValidation.id
     );
@@ -486,8 +493,8 @@ const Client = (props: IClientProps): JSX.Element => {
           : undefined,
     } as IClientUpdate;
 
-    props.updateClientThunk(editClientData);
-    updateClientList(pagination.rows, pagination.page);
+    await props.updateClientThunk(editClientData);
+    await updateClientList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
 
@@ -501,7 +508,7 @@ const Client = (props: IClientProps): JSX.Element => {
       email: '',
       name: '',
       phoneNumber: '',
-      size: '',
+      size: ClothSizes.XS,
     });
   };
 
@@ -537,9 +544,9 @@ const Client = (props: IClientProps): JSX.Element => {
     setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleDeleteClient = (id: number) => () => {
-    props.deleteClientThunk({ id });
-    updateClientList(pagination.rows, pagination.page);
+  const handleDeleteClient = (id: number) => async () => {
+    await props.deleteClientThunk({ id });
+    await updateClientList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
 

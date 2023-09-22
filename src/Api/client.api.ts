@@ -1,230 +1,70 @@
+import { AxiosError } from 'axios';
 import {
-  ClothSizes,
   IClient,
   IClientCreate,
   IClientDelete,
+  IClientError,
   IClientGet,
   IClientState,
   IClientUpdate,
 } from '../Redux/interfaces';
-import { EnumSort } from '../utils/enums/enum.sort';
 import { instance } from './axios.instance';
 
-let client = [
-  {
-    id: 1,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 2,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 3,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 4,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 5,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 6,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 7,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 8,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 9,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 10,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 11,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-  {
-    id: 12,
-    name: 'name',
-    email: 'email',
-    phoneNumber: 'phone',
-    size: ClothSizes.S,
-    createdBy: 'id',
-    createdAt: 'isodate',
-    updatedBy: 'id',
-    updatedAt: 'isodate',
-    deletedBy: 'id',
-  },
-] as IClient[];
-
 export const ClientApi = {
-  getAllClient: (clientData: IClientGet): Promise<IClientState> | IClientState => {
-    const startIndex = (clientData?.page || 0) * (clientData?.limit || 10);
-
-    let clientSorted = [] as IClient[];
-    if (clientData?.sort?.orderBy) {
-      type propType = keyof typeof client[0]
-      const property = clientData.sort.orderBy as propType;
-      clientSorted = client.sort((a, b) => {
-        if (clientData.sort?.order === EnumSort.asc) {
-          return a[property] > b[property] ? 1 : -1;
-        } else {
-          return a[property] < b[property] ? 1 : -1;
-        }
-      });
+  getAllClient: async (clientData: IClientGet): Promise<IClientState | IClientError> => {
+    if (clientData === undefined) {
+      return [] as any;
     }
 
-    const resp = (clientSorted.length === client.length ? clientSorted : client)
-      .slice(startIndex, startIndex + (clientData?.limit || 10));
-    return { client: resp, clientCount: client.length };
-  },
-
-  createClient: (clientData: IClientCreate): Promise<IClient> | IClient => {
-    const newClient = {
-      ...clientData,
-      createdAt: '',
-      createdBy: '',
-      deletedBy: '',
-      id: client[client.length - 1].id + 1,
-      updatedAt:
-        'updatedAt',
-      updatedBy: 'updatedBy',
-    };
-
-    client.push(newClient);
-    return newClient;
-  },
-
-  updateClient: (clientData: IClientUpdate): Promise<IClient> | IClient => {
-    const existingClient = client.find((client) => client.id === clientData.id);
-    if (!existingClient) {
-      throw Error('Client not found');
+    try {
+      const { filter, limit, page, sort } = clientData;
+      return (
+        await instance.get<IClientState>(
+          'client', {
+            params: {
+              limit,
+              page,
+              order: sort?.order,
+              orderBy: sort?.orderBy,
+              email: filter?.email,
+              id: filter?.id,
+              phoneNumber: filter?.phoneNumber,
+              name: filter?.name,
+              size: filter?.size,
+            },
+          }
+        )
+      ).data;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.message };
     }
-
-    const updatedClient = {
-      createdAt: existingClient.createdBy,
-      createdBy: existingClient.createdBy,
-      deletedBy: existingClient.deletedBy,
-      email: clientData.email || existingClient.email,
-      id: existingClient.id,
-      name: clientData.name || existingClient.name,
-      updatedAt: 'date',
-      updatedBy: 'id',
-      phoneNumber: clientData.phoneNumber || existingClient.phoneNumber,
-      size: clientData.size || existingClient.size,
-    } as IClient;
-
-    client = client.map((client) => {
-      if (client.id === clientData.id) {
-        client = updatedClient;
-      }
-      return client;
-    });
-    return updatedClient;
   },
 
-  deleteClient: (clientData: IClientDelete): Promise<number> | number => {
-    client = client.filter((client) => client.id !== clientData.id);
-    return clientData.id;
+  createClient: async (clientData: IClientCreate): Promise<IClient | IClientError> => {
+    try {
+      return (await instance.post('client', clientData)).data;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.response?.message?.toString() || error.response?.data?.message };
+    }
+  },
+
+  updateClient: async (clientData: IClientUpdate): Promise<IClient | IClientError> => {
+    try {
+      return (await instance.put('client', clientData)).data;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.response?.message?.toString() || error.response?.data?.message };
+    }
+  },
+
+  deleteClient: async (clientData: IClientDelete): Promise<number | IClientError> => {
+    try {
+      return (await instance.delete('client', { params: clientData })).data;
+    } catch (e) {
+      const error = e as AxiosError<any>;
+      return { error: error.response?.data?.response?.message?.toString() || error.response?.data?.message };
+    }
   },
 };

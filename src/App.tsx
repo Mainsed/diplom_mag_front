@@ -12,8 +12,9 @@ import { SnackbarProvider, enqueueSnackbar } from 'notistack';
 const App = (props: IAppProps) => {
   useEffect(() => {
     const isAuthorized = Cookies.get('isAuthorized');
+    const userName = Cookies.get('userName');
 
-    props.setAuthorized(isAuthorized === 'true');
+    props.setAuthorized(isAuthorized === 'true', userName);
   }, []);
 
   useEffect(() => {

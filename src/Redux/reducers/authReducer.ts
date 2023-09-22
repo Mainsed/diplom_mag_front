@@ -19,7 +19,8 @@ const authReducer = (state = initialState, action: ActionTypes): IAuthState => {
 
     case SET_AUTHORIZE: {
       const newAuth = { ...state.auth };
-      newAuth.isAuthorized = action.data;
+      newAuth.isAuthorized = action.data.isAuthorized;
+      newAuth.name = action.data.userName;
       return { ...state, auth: newAuth };
     }
 
@@ -54,7 +55,10 @@ type LogoutActionType = {
 
 type SetAuthorizeActionType = {
   type: typeof SET_AUTHORIZE;
-  data: boolean;
+  data: {
+    isAuthorized: boolean,
+    userName?: string
+  };
 }
 
 type ClearErrorActionType = {
@@ -63,8 +67,8 @@ type ClearErrorActionType = {
 }
 
 // actions
-export const setAuthorized = (isAuthorized: boolean): SetAuthorizeActionType => {
-  return { type: SET_AUTHORIZE, data: isAuthorized };
+export const setAuthorized = (isAuthorized: boolean, userName?: string): SetAuthorizeActionType => {
+  return { type: SET_AUTHORIZE, data: { isAuthorized, userName } };
 };
 
 export const clearAuthError = (): ClearErrorActionType => {
