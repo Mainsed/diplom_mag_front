@@ -6,7 +6,7 @@ const initialState = {} as IClientState;
 
 const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_CLIENT = 'GET_CLIENT',
-  SET_ERROR = 'SET_ERROR';
+  SET_CLIENT_ERROR = 'SET_CLIENT_ERROR';
 
 export type ActionTypes = GetClientActionType | SetErrorActionType | ClearErrorActionType
 
@@ -23,7 +23,7 @@ const clientReducer = (state = initialState, action: ActionTypes): IClientState 
       return { ...state, clientError: undefined };
     }
 
-    case SET_ERROR: {
+    case SET_CLIENT_ERROR: {
       return { ...state, clientError: action.data };
     }
 
@@ -38,7 +38,7 @@ type GetClientActionType = {
 }
 
 type SetErrorActionType = {
-  type: typeof SET_ERROR;
+  type: typeof SET_CLIENT_ERROR;
   data: string;
 }
 
@@ -49,11 +49,9 @@ type ClearErrorActionType = {
 
 // thunks
 export const getClientThunk = (clientData: IClientGet) => async (dispatch: Dispatch<ActionTypes>) => {
-  console.log('123');
   const clientResp = await ClientApi.getAllClient(clientData);
-  console.log(clientResp);
   if ('error' in clientResp) {
-    dispatch({ type: SET_ERROR, data: clientResp.error });
+    dispatch({ type: SET_CLIENT_ERROR, data: clientResp.error });
     return;
   }
 
@@ -64,7 +62,7 @@ export const createClientThunk = (clientToCreate: IClientCreate) => async (dispa
   const client = await ClientApi.createClient(clientToCreate);
 
   if ('error' in client) {
-    dispatch({ type: SET_ERROR, data: client.error });
+    dispatch({ type: SET_CLIENT_ERROR, data: client.error });
   }
 };
 
@@ -72,7 +70,7 @@ export const updateClientThunk = (clientToUpdate: IClientUpdate) => async (dispa
   const client = await ClientApi.updateClient(clientToUpdate);
 
   if ('error' in client) {
-    dispatch({ type: SET_ERROR, data: client.error });
+    dispatch({ type: SET_CLIENT_ERROR, data: client.error });
   }
 };
 
@@ -80,7 +78,7 @@ export const deleteClientThunk = (clientToDelete: IClientDelete) => async (dispa
   const client = await ClientApi.deleteClient(clientToDelete);
 
   if (typeof client === 'object') {
-    dispatch({ type: SET_ERROR, data: client.error });
+    dispatch({ type: SET_CLIENT_ERROR, data: client.error });
   }
 };
 

@@ -16,6 +16,10 @@ export interface IClothSizeInShops {
   clothId: number;
 }
 
+export interface IClothError {
+  error: string,
+}
+
 export interface ICloth {
   id: number;
   name: string;
@@ -33,6 +37,7 @@ export interface IClothState {
   cloth: ICloth[];
   clothCount: number;
   sizesByShop?: IClothSizeInShops[];
+  clothError?: string;
 }
 
 export interface IClothProps {

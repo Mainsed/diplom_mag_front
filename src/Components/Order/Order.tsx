@@ -802,8 +802,12 @@ const Order = (props: IOrderProps): JSX.Element => {
                   </TableCell>
                   <TableCell align="center">{order.status}</TableCell>
                   <TableCell align="center">{order.price}</TableCell>
-                  <TableCell align="center">{order.updatedAt}</TableCell>
-                  <TableCell align="center">{order.updatedBy}</TableCell>
+                  <TableCell align="center">
+                    {order.updatedAt || order.createdAt}
+                  </TableCell>
+                  <TableCell align="center">
+                    {order.deletedBy || order.updatedBy || order.createdBy}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton onClick={menu.handleMenuClick(order.id)}>
                       <MoreHorizIcon />

@@ -4,6 +4,8 @@ export interface IAppProps {
   auth: IAuth,
   errors: string[],
   setAuthorized(isAuthorized: boolean, userName?: string): void,
-  clearAuthError(): void,
-  clearStaffError(): void,
+  clearError(): void,
+  // clearStaffError(): void,
+  // clearClientError(): void,
+  // clearClothError(): void,
 }

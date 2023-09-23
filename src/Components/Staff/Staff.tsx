@@ -1135,8 +1135,12 @@ const Staff = (props: IStaffProps): JSX.Element => {
                     )}
                   </TableCell>
                   <TableCell align="center">{staff.storeId}</TableCell>
-                  <TableCell align="center">{staff.updatedAt}</TableCell>
-                  <TableCell align="center">{staff.updatedBy}</TableCell>
+                  <TableCell align="center">
+                    {staff.updatedAt || staff.createdAt}
+                  </TableCell>
+                  <TableCell align="center">
+                    {staff.deletedBy || staff.updatedBy || staff.createdBy}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton onClick={menu.handleMenuClick(staff.id)}>
                       <MoreHorizIcon />

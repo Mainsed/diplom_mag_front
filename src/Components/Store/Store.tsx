@@ -688,8 +688,12 @@ const Store = (props: IStoreProps): JSX.Element => {
                       <ClearIcon color="error" />
                     )}
                   </TableCell>
-                  <TableCell align="center">{store.updatedAt}</TableCell>
-                  <TableCell align="center">{store.updatedBy}</TableCell>
+                  <TableCell align="center">
+                    {store.updatedAt || store.createdAt}
+                  </TableCell>
+                  <TableCell align="center">
+                    {store.deletedBy || store.updatedBy || store.createdBy}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton onClick={menu.handleMenuClick(store.id)}>
                       <MoreHorizIcon />

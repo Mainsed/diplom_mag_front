@@ -2,15 +2,19 @@ import { connect } from 'react-redux';
 import React from 'react';
 import { IAppProps, IState } from '../Redux/interfaces';
 import App from '../App';
-import { clearAuthError, setAuthorized } from '../Redux/reducers/authReducer';
-import { clearStaffError } from '../Redux/reducers/staffReducer';
+import { clearError, setAuthorized } from '../Redux/reducers/authReducer';
 
 const AppContainer = (props: any) => {
   return <App {...props} />;
 };
 
 const mapStateToProps = (state: IState): Partial<IAppProps> => {
-  const stateErrors = [state.auth?.auth?.error, state.staff.staffError];
+  const stateErrors = [
+    state.auth?.auth?.error,
+    state.staff.staffError,
+    state.client.clientError,
+    state.cloth.clothError,
+  ];
 
   const errors = stateErrors.filter(
     (error) => typeof error === 'string'
@@ -24,6 +28,5 @@ const mapStateToProps = (state: IState): Partial<IAppProps> => {
 
 export default connect(mapStateToProps, {
   setAuthorized,
-  clearAuthError,
-  clearStaffError,
+  clearError,
 })(AppContainer);

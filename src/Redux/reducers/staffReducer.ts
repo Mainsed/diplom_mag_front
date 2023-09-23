@@ -6,7 +6,7 @@ const initialState = {} as IStaffState;
 
 const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_STAFF = 'GET_STAFF',
-  SET_ERROR = 'SET_ERROR';
+  SET_STAFF_ERROR = 'SET_STAFF_ERROR';
 
 export type ActionTypes = GetStaffActionType
 | SetErrorActionType
@@ -25,7 +25,7 @@ const staffReducer = (state = initialState, action: ActionTypes): IStaffState =>
       return { ...state, staffError: undefined };
     }
 
-    case SET_ERROR: {
+    case SET_STAFF_ERROR: {
       return { ...state, staffError: action.data };
     }
 
@@ -40,7 +40,7 @@ type GetStaffActionType = {
 }
 
 type SetErrorActionType = {
-  type: typeof SET_ERROR;
+  type: typeof SET_STAFF_ERROR;
   data: string;
 }
 
@@ -49,17 +49,12 @@ type ClearErrorActionType = {
   data: undefined;
 }
 
-// actions
-export const clearStaffError = (): ClearErrorActionType => {
-  return { type: CLEAR_ERROR, data: undefined };
-};
-
 // thunks
 export const getStaffThunk = (staffData: IStaffGet) => async (dispatch: Dispatch<ActionTypes>) => {
   const staffResp = await StaffApi.getAllStaff(staffData);
 
   if ('error' in staffResp) {
-    dispatch({ type: SET_ERROR, data: staffResp.error });
+    dispatch({ type: SET_STAFF_ERROR, data: staffResp.error });
     return;
   }
 
@@ -70,7 +65,7 @@ export const createStaffThunk = (staffToCreate: IStaffCreate) => async (dispatch
   const staffResp = await StaffApi.createStaff(staffToCreate);
 
   if ('error' in staffResp) {
-    dispatch({ type: SET_ERROR, data: staffResp.error });
+    dispatch({ type: SET_STAFF_ERROR, data: staffResp.error });
   }
 };
 
@@ -78,7 +73,7 @@ export const updateStaffThunk = (staffToUpdate: IStaffUpdate) => async (dispatch
   const staff = await StaffApi.updateStaff(staffToUpdate);
 
   if ('error' in staff) {
-    dispatch({ type: SET_ERROR, data: staff.error });
+    dispatch({ type: SET_STAFF_ERROR, data: staff.error });
   }
 };
 
@@ -86,7 +81,7 @@ export const deleteStaffThunk = (staffToDelete: IStaffDelete) => async (dispatch
   const staff = await StaffApi.deleteStaff(staffToDelete);
 
   if (typeof staff === 'object') {
-    dispatch({ type: SET_ERROR, data: staff.error });
+    dispatch({ type: SET_STAFF_ERROR, data: staff.error });
   }
 };
 

@@ -822,8 +822,8 @@ const Client = (props: IClientProps): JSX.Element => {
                   <TableCell align="center">{client.name}</TableCell>
                   <TableCell align="center">{client.phoneNumber}</TableCell>
                   <TableCell align="center">{client.size}</TableCell>
-                  <TableCell align="center">{client.updatedAt}</TableCell>
-                  <TableCell align="center">{client.updatedBy}</TableCell>
+                  <TableCell align="center">{client.updatedAt || client.createdAt}</TableCell>
+                  <TableCell align="center">{client.deletedBy || client.updatedBy || client.createdBy}</TableCell>
                   <TableCell align="center">
                     <IconButton onClick={menu.handleMenuClick(client.id)}>
                       <MoreHorizIcon />

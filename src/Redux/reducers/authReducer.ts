@@ -71,7 +71,7 @@ export const setAuthorized = (isAuthorized: boolean, userName?: string): SetAuth
   return { type: SET_AUTHORIZE, data: { isAuthorized, userName } };
 };
 
-export const clearAuthError = (): ClearErrorActionType => {
+export const clearError = (): ClearErrorActionType => {
   return { type: CLEAR_ERROR, data: undefined };
 };
 

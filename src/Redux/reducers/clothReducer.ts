@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux';
 import {
-  ICloth,
   IClothCreate,
   IClothDelete,
   IClothGet,
@@ -12,18 +11,16 @@ import { ClothApi } from '../../Api/cloth.api';
 
 const initialState = {} as IClothState;
 
-const CREATE_CLOTH = 'CREATE_CLOTH',
-  DELETE_CLOTH = 'DELETE_CLOTH',
+const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_CLOTH = 'GET_CLOTH',
   GET_CLOTH_SIZES = 'GET_CLOTH_SIZES',
-  UPDATE_CLOTH = 'UPDATE_CLOTH';
+  SET_CLOTH_ERROR = 'SET_CLOTH_ERROR';
 
 export type ActionTypes =
   GetClothActionType |
-  UpdateClothActionType |
-  CreateClothActionType |
-  DeleteClothActionType |
-  GetClothSizesActionType
+  GetClothSizesActionType |
+  SetErrorActionType |
+  ClearErrorActionType
 
 const clothReducer = (state = initialState, action: ActionTypes): IClothState => {
   switch (action.type) {
@@ -49,26 +46,15 @@ const clothReducer = (state = initialState, action: ActionTypes): IClothState =>
       return { ...state, sizesByShop: newSizesByShop };
     }
 
-    case CREATE_CLOTH: {
-      const newState = { ...state };
-      newState.cloth.push(action.data);
-      return newState;
+    case CLEAR_ERROR: {
+      if (state.clothError === undefined) {
+        return state;
+      }
+      return { ...state, clothError: undefined };
     }
 
-    case DELETE_CLOTH: {
-      const newState = { ...state };
-      const newCloth = newState.cloth.filter((cloth) => cloth.id !== action.data);
-      return { ...newState, cloth: newCloth };
-    }
-
-    case UPDATE_CLOTH: {
-      const newCloth = state.cloth.map((cloth) => {
-        if (cloth.id === action.data.id) {
-          cloth = action.data;
-        }
-        return cloth;
-      });
-      return { ...state, cloth: newCloth };
+    case SET_CLOTH_ERROR: {
+      return { ...state, clothError: action.data };
     }
 
     default:
@@ -86,24 +72,24 @@ type GetClothSizesActionType = {
   data: IClothSizeInShops
 }
 
-type CreateClothActionType = {
-  type: typeof CREATE_CLOTH;
-  data: ICloth
+type SetErrorActionType = {
+  type: typeof SET_CLOTH_ERROR;
+  data: string;
 }
 
-type UpdateClothActionType = {
-  type: typeof UPDATE_CLOTH;
-  data: ICloth
-}
-
-type DeleteClothActionType = {
-  type: typeof DELETE_CLOTH;
-  data: number
+type ClearErrorActionType = {
+  type: typeof CLEAR_ERROR;
+  data: undefined;
 }
 
 // thunks
 export const getClothThunk = (clothData: IClothGet) => async (dispatch: Dispatch<ActionTypes>) => {
   const clothResp = await ClothApi.getAllCloth(clothData);
+
+  if ('error' in clothResp) {
+    dispatch({ type: SET_CLOTH_ERROR, data: clothResp.error });
+    return;
+  }
 
   dispatch({ type: GET_CLOTH, data: clothResp });
 };
@@ -111,25 +97,36 @@ export const getClothThunk = (clothData: IClothGet) => async (dispatch: Dispatch
 export const getClothSizesThunk = (shopId: number) => async (dispatch: Dispatch<ActionTypes>) => {
   const clothResp = await ClothApi.getClothSizeCountByShop(shopId);
 
+  if ('error' in clothResp) {
+    dispatch({ type: SET_CLOTH_ERROR, data: clothResp.error });
+    return;
+  }
+
   dispatch({ type: GET_CLOTH_SIZES, data: clothResp });
 };
 
 export const createClothThunk = (clothToCreate: IClothCreate) => async (dispatch: Dispatch<ActionTypes>) => {
   const cloth = await ClothApi.createCloth(clothToCreate);
 
-  dispatch({ type: CREATE_CLOTH, data: cloth });
+  if ('error' in cloth) {
+    dispatch({ type: SET_CLOTH_ERROR, data: cloth.error });
+  }
 };
 
 export const updateClothThunk = (clothToUpdate: IClothUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
   const cloth = await ClothApi.updateCloth(clothToUpdate);
 
-  dispatch({ type: UPDATE_CLOTH, data: cloth });
+  if ('error' in cloth) {
+    dispatch({ type: SET_CLOTH_ERROR, data: cloth.error });
+  }
 };
 
 export const deleteClothThunk = (clothToDelete: IClothDelete) => async (dispatch: Dispatch<ActionTypes>) => {
   const cloth = await ClothApi.deleteCloth(clothToDelete);
 
-  dispatch({ type: DELETE_CLOTH, data: cloth });
+  if (typeof cloth === 'object') {
+    dispatch({ type: SET_CLOTH_ERROR, data: cloth.error });
+  }
 };
 
 export default clothReducer;

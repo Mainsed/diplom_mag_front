@@ -1024,8 +1024,14 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                     <TableCell align="center">
                       {!Number.isNaN(delivery.price) ? delivery.price : ''}
                     </TableCell>
-                    <TableCell align="center">{delivery.updatedAt}</TableCell>
-                    <TableCell align="center">{delivery.updatedBy}</TableCell>
+                    <TableCell align="center">
+                      {delivery.updatedAt || delivery.createdAt}
+                    </TableCell>
+                    <TableCell align="center">
+                      {delivery.deletedBy ||
+                        delivery.updatedBy ||
+                        delivery.createdBy}
+                    </TableCell>
                     <TableCell align="center">
                       <IconButton onClick={menu.handleMenuClick(delivery.id)}>
                         <MoreHorizIcon />

@@ -84,7 +84,14 @@ const theme = createTheme({
 
 const Cloth = (props: IClothProps): JSX.Element => {
   useEffect(() => {
-    props.getClothThunk();
+    props.getClothThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
   }, []);
 
   const cloths = props.cloth?.cloth || [];
@@ -412,11 +419,11 @@ const Cloth = (props: IClothProps): JSX.Element => {
     );
   };
 
-  const handleColapseToggle = (clothId: number) => () => {
+  const handleColapseToggle = (clothId: number) => async () => {
     if (colapseOpen.indexOf(clothId) !== -1) {
       setColapseOpen(colapseOpen.filter((colapse) => colapse !== clothId));
     } else {
-      props.getClothSizesThunk(clothId);
+      await props.getClothSizesThunk(clothId);
       setColapseOpen([...colapseOpen, clothId]);
     }
   };
@@ -431,11 +438,11 @@ const Cloth = (props: IClothProps): JSX.Element => {
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        availableSizes: filter.availableSizes as ClothSizes[],
-        name: filter.name,
-        desc: filter.desc,
-        price: parseInt(filter.price),
+        id: parseInt(filter.id) || undefined,
+        availableSizes: (filter.availableSizes as ClothSizes[]) || undefined,
+        name: filter.name || undefined,
+        desc: filter.desc || undefined,
+        price: parseInt(filter.price) || undefined,
       },
       sort: {
         order: orderString,
@@ -448,7 +455,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateCloth = () => {
+  const handleCreateCloth = async () => {
     const createClothData = {
       desc: createValidation.desc,
       name: createValidation.name,
@@ -456,12 +463,12 @@ const Cloth = (props: IClothProps): JSX.Element => {
       availableSizes: createValidation.availableSizes,
     } as IClothCreate;
 
-    props.createClothThunk(createClothData);
+    await props.createClothThunk(createClothData);
     updateClothList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
-  const handleEditCloth = () => {
+  const handleEditCloth = async () => {
     const ClothChanged = cloths.find((cloth) => cloth.id === editValidation.id);
 
     if (!ClothChanged) {
@@ -489,7 +496,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
           : undefined,
     } as IClothUpdate;
 
-    props.updateClothThunk(editClothData);
+    await props.updateClothThunk(editClothData);
     updateClothList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
@@ -540,8 +547,8 @@ const Cloth = (props: IClothProps): JSX.Element => {
     setDeleteValidation({ id: NaN, name: '' });
   };
 
-  const handleDeleteCloth = (id: number) => () => {
-    props.deleteClothThunk({ id });
+  const handleDeleteCloth = (id: number) => async () => {
+    await props.deleteClothThunk({ id });
     updateClothList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
@@ -825,8 +832,12 @@ const Cloth = (props: IClothProps): JSX.Element => {
                         </span>
                       ))}
                     </TableCell>
-                    <TableCell align="center">{cloth.updatedAt}</TableCell>
-                    <TableCell align="center">{cloth.updatedBy}</TableCell>
+                    <TableCell align="center">
+                      {cloth.updatedAt || cloth.createdAt}
+                    </TableCell>
+                    <TableCell align="center">
+                      {cloth.deletedBy || cloth.updatedBy || cloth.createdBy}
+                    </TableCell>
                     <TableCell align="center">
                       <IconButton onClick={menu.handleMenuClick(cloth.id)}>
                         <MoreHorizIcon />
@@ -845,34 +856,47 @@ const Cloth = (props: IClothProps): JSX.Element => {
                         unmountOnExit
                       >
                         <Paper className="shopSizesWrap" elevation={3}>
-                          <Typography align="center">
-                            Кількість товару в магазинах
-                          </Typography>
-                          <Grid container>
-                            {props.cloth?.sizesByShop
-                              ?.find(
-                                (clothByShops) =>
-                                  clothByShops.clothId === cloth.id
-                              )
-                              ?.shops.map((shop, i) => (
-                                <Grid item xs={6} md={4} lg={3} key={i}>
-                                  <Grid container justifyContent="center">
-                                    <Paper className="shopSizes" elevation={3}>
-                                      <Typography align="center">
-                                        Номер магазину: {shop.shopId}
-                                      </Typography>
-                                      {shop.sizes.map((size) => (
-                                        <Grid key={size.size + shop.shopId}>
-                                          <Typography align="center">
-                                            {size.size}: {size.count} шт.
-                                          </Typography>
+                          {props.cloth?.sizesByShop?.find(
+                            (clothByShops) => clothByShops.clothId === cloth.id
+                          )?.shops?.length ? (
+                              <>
+                                <Typography align="center">
+                                Кількість товару в магазинах
+                                </Typography>
+                                <Grid container>
+                                  {props.cloth?.sizesByShop
+                                    ?.find(
+                                      (clothByShops) =>
+                                        clothByShops.clothId === cloth.id
+                                    )
+                                    ?.shops.map((shop, i) => (
+                                      <Grid item xs={6} md={4} lg={3} key={i}>
+                                        <Grid container justifyContent="center">
+                                          <Paper
+                                            className="shopSizes"
+                                            elevation={3}
+                                          >
+                                            <Typography align="center">
+                                            Номер магазину: {shop.shopId}
+                                            </Typography>
+                                            {shop.sizes.map((size) => (
+                                              <Grid key={size.size + shop.shopId}>
+                                                <Typography align="center">
+                                                  {size.size}: {size.count} шт.
+                                                </Typography>
+                                              </Grid>
+                                            ))}
+                                          </Paper>
                                         </Grid>
-                                      ))}
-                                    </Paper>
-                                  </Grid>
+                                      </Grid>
+                                    ))}
                                 </Grid>
-                              ))}
-                          </Grid>
+                              </>
+                            ) : (
+                              <Typography align="center">
+                              Цього товару ще нема в магазинах
+                              </Typography>
+                            )}
                         </Paper>
                       </Collapse>
                     </TableCell>

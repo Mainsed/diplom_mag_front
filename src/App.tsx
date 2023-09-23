@@ -25,8 +25,7 @@ const App = (props: IAppProps) => {
         anchorOrigin: { vertical: 'top', horizontal: 'right' },
       });
     });
-    props.clearAuthError();
-    props.clearStaffError();
+    props.clearError();
   }, [props.errors]);
 
   return (
