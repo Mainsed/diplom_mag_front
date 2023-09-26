@@ -1,4 +1,5 @@
 import { IGetSort } from '../../utils/interfaces/get.sort.interface';
+import { ClothSizes } from './client.interface';
 
 export enum OrderStatuses {
   CREATED = 'CREATED',
@@ -9,10 +10,16 @@ export enum OrderStatuses {
   COMPLETED = 'COMPLETED'
 }
 
+export interface IClothId {
+  clothId: number;
+  amount: number;
+  size: ClothSizes;
+}
+
 export interface IOrder {
   id: number;
   clientId: string;
-  clothIdList: string[];
+  clothIdList: IClothId[];
   status: OrderStatuses;
   price: number;
   createdBy: string;
@@ -25,6 +32,11 @@ export interface IOrder {
 export interface IOrderState {
   order: IOrder[],
   orderCount: number,
+  orderError?: string,
+}
+
+export interface IOrderError {
+  error: string,
 }
 
 export interface IOrderProps {
@@ -37,14 +49,14 @@ export interface IOrderProps {
 
 export interface IOrderCreate {
   clientId: string;
-  clothIdList: string[];
+  clothIdList: IClothId[];
   status?: OrderStatuses;
 }
 
 export interface IOrderUpdate {
   id: number;
   clientId?: string;
-  clothIdList?: string[];
+  clothIdList?: IClothId[];
   status?: OrderStatuses;
 }
 
@@ -55,7 +67,6 @@ export interface IOrderDelete {
 export interface IOrderGetFilter {
   id?: number;
   clientId?: string;
-  clothIdList?: string[];
   status?: OrderStatuses;
 }
 

@@ -110,7 +110,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
   });
 
   const [clothDeliverValidation, setClothDeliverValidation] = useState<
-  IClothDelivered[]
+    IClothDelivered[]
   >([
     {
       clothId: 0,
@@ -251,8 +251,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                 color="button"
                 type="number"
                 value={price}
-                validators={['required']}
-                errorMessages={["Це поле обов'язкове"]}
+                validators={['required', 'minNumber:1']}
+                errorMessages={[
+                  "Це поле обов'язкове",
+                  'Мінімальне значення - 1',
+                ]}
                 className="formElem"
               />
             ) : (
@@ -365,8 +368,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                 color="button"
                 type="number"
                 value={editPrice}
-                validators={['required']}
-                errorMessages={["Це поле обов'язкове"]}
+                validators={['required', 'minNumber:1']}
+                errorMessages={[
+                  "Це поле обов'язкове",
+                  'Мінімальне значення - 1',
+                ]}
                 className="formElem"
               />
             ) : (
@@ -441,8 +447,8 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           const availableSizes = Object.values(ClothSizes).filter(
             (size) =>
               clothDeliver.sizes.findIndex(
-                (clothSize) => clothSize.size === size
-              ) === -1
+                (clothSize) => clothSize.size === size,
+              ) === -1,
           );
           return (
             <Grid item xs={4} key={i}>
@@ -456,8 +462,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   name="clothId"
                   color="button"
                   value={clothDeliver.clothId}
-                  validators={['required']}
-                  errorMessages={["Це поле обов'язкове"]}
+                  validators={['required', 'minNumber:1']}
+                  errorMessages={[
+                    "Це поле обов'язкове",
+                    'Мінімальне значення - 1',
+                  ]}
                   className="formElem"
                   onFocus={(event: any) => {
                     event.target.select();
@@ -490,8 +499,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                         }}
                         type="number"
                         onChange={handleClothDeliverChange(i)}
-                        validators={['required']}
-                        errorMessages={["Це поле обов'язкове"]}
+                        validators={['required', 'minNumber:1']}
+                        errorMessages={[
+                          "Це поле обов'язкове",
+                          'Мінімальне значення - 1',
+                        ]}
                       />{' '}
                       шт.
                       <IconButton
@@ -559,7 +571,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
     props.getDeliveryThunk({
       limit: rows,
@@ -596,7 +608,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const handleEditDelivery = () => {
     const DeliveryChanged = delivers.find(
-      (delivery) => delivery.id === parseInt(editValidation.id)
+      (delivery) => delivery.id === parseInt(editValidation.id),
     );
 
     if (!DeliveryChanged) {
@@ -734,7 +746,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           }
         }
         return clothDeliver;
-      })
+      }),
     );
   };
 
@@ -771,7 +783,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           };
         }
         return clothDeliver;
-      })
+      }),
     );
   };
 
@@ -782,12 +794,12 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           return {
             clothId: clothDeliver.clothId,
             sizes: clothDeliver.sizes.filter(
-              (clothSize) => clothSize.size !== size
+              (clothSize) => clothSize.size !== size,
             ),
           };
         }
         return clothDeliver;
-      })
+      }),
     );
   };
 
@@ -807,14 +819,14 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateDeliveryList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -1076,7 +1088,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                                     </Paper>
                                   </Grid>
                                 </Grid>
-                              )
+                              ),
                             )}
                           </Grid>
                         </Paper>

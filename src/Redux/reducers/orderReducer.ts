@@ -1,15 +1,14 @@
 import { Dispatch } from 'redux';
-import { IOrder, IOrderCreate, IOrderDelete, IOrderGet, IOrderState, IOrderUpdate } from '../interfaces';
+import { IOrderCreate, IOrderDelete, IOrderGet, IOrderState, IOrderUpdate } from '../interfaces';
 import { OrderApi } from '../../Api/order.api';
 
 const initialState = {} as IOrderState;
 
-const CREATE_ORDER = 'CREATE_ORDER',
-  DELETE_ORDER = 'DELETE_ORDER',
+const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_ORDER = 'GET_ORDER',
-  UPDATE_ORDER = 'UPDATE_ORDER';
+  SET_ORDER_ERROR = 'SET_ORDER_ERROR';
 
-export type ActionTypes = GetOrderActionType | UpdateOrderActionType | CreateOrderActionType | DeleteOrderActionType
+export type ActionTypes = GetOrderActionType | SetErrorActionType | ClearErrorActionType
 
 const orderReducer = (state = initialState, action: ActionTypes): IOrderState => {
   switch (action.type) {
@@ -17,26 +16,15 @@ const orderReducer = (state = initialState, action: ActionTypes): IOrderState =>
       return action.data;
     }
 
-    case CREATE_ORDER: {
-      const newState = { ...state };
-      newState.order.push(action.data);
-      return newState;
+    case CLEAR_ERROR: {
+      if (state.orderError === undefined) {
+        return state;
+      }
+      return { ...state, orderError: undefined };
     }
 
-    case DELETE_ORDER: {
-      const newState = { ...state };
-      const newOrder = newState.order.filter((order) => order.id !== action.data);
-      return { ...newState, order: newOrder };
-    }
-
-    case UPDATE_ORDER: {
-      const newOrder = state.order.map((order) => {
-        if (order.id === action.data.id) {
-          order = action.data;
-        }
-        return order;
-      });
-      return { ...state, order: newOrder };
+    case SET_ORDER_ERROR: {
+      return { ...state, orderError: action.data };
     }
 
     default:
@@ -49,24 +37,24 @@ type GetOrderActionType = {
   data: IOrderState
 }
 
-type CreateOrderActionType = {
-  type: typeof CREATE_ORDER;
-  data: IOrder
+type SetErrorActionType = {
+  type: typeof SET_ORDER_ERROR;
+  data: string;
 }
 
-type UpdateOrderActionType = {
-  type: typeof UPDATE_ORDER;
-  data: IOrder
-}
-
-type DeleteOrderActionType = {
-  type: typeof DELETE_ORDER;
-  data: number
+type ClearErrorActionType = {
+  type: typeof CLEAR_ERROR;
+  data: undefined;
 }
 
 // thunks
 export const getOrderThunk = (orderData: IOrderGet) => async (dispatch: Dispatch<ActionTypes>) => {
   const orderResp = await OrderApi.getAllOrder(orderData);
+
+  if ('error' in orderResp) {
+    dispatch({ type: SET_ORDER_ERROR, data: orderResp.error });
+    return;
+  }
 
   dispatch({ type: GET_ORDER, data: orderResp });
 };
@@ -74,19 +62,25 @@ export const getOrderThunk = (orderData: IOrderGet) => async (dispatch: Dispatch
 export const createOrderThunk = (orderToCreate: IOrderCreate) => async (dispatch: Dispatch<ActionTypes>) => {
   const order = await OrderApi.createOrder(orderToCreate);
 
-  dispatch({ type: CREATE_ORDER, data: order });
+  if ('error' in order) {
+    dispatch({ type: SET_ORDER_ERROR, data: order.error });
+  }
 };
 
 export const updateOrderThunk = (orderToUpdate: IOrderUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
   const order = await OrderApi.updateOrder(orderToUpdate);
 
-  dispatch({ type: UPDATE_ORDER, data: order });
+  if ('error' in order) {
+    dispatch({ type: SET_ORDER_ERROR, data: order.error });
+  }
 };
 
 export const deleteOrderThunk = (orderToDelete: IOrderDelete) => async (dispatch: Dispatch<ActionTypes>) => {
   const order = await OrderApi.deleteOrder(orderToDelete);
 
-  dispatch({ type: DELETE_ORDER, data: order });
+  if (typeof order === 'object') {
+    dispatch({ type: SET_ORDER_ERROR, data: order.error });
+  }
 };
 
 export default orderReducer;

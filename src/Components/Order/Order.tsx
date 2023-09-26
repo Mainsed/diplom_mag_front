@@ -30,9 +30,12 @@ import React, { useState, useEffect } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
   FilterAlt as FilterAltIcon,
+  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import {
+  ClothSizes,
+  IClothId,
   IOrder,
   IOrderCreate,
   IOrderProps,
@@ -40,6 +43,7 @@ import {
   OrderStatuses,
 } from '../../Redux/interfaces';
 import { EnumSort } from '../../utils/enums/enum.sort';
+import './Order.css';
 
 // declaring new color names
 
@@ -80,28 +84,32 @@ const theme = createTheme({
 
 const Order = (props: IOrderProps): JSX.Element => {
   useEffect(() => {
-    props.getOrderThunk();
+    props.getOrderThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
   }, []);
   const orders = props.order?.order || [];
   const orderCount = props.order?.orderCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
     clientId: '',
-    clothIdList: [] as string[],
     status: OrderStatuses.CREATED,
   });
 
   const [editValidation, setEditValidation] = useState({
     id: NaN,
     clientId: '',
-    clothIdList: [] as string[],
     status: '' as OrderStatuses,
   });
 
   const [filter, setFilter] = useState({
     id: '',
     clientId: '',
-    clothIdList: [] as string[],
     status: '' as OrderStatuses,
   });
 
@@ -118,6 +126,14 @@ const Order = (props: IOrderProps): JSX.Element => {
   const [deleteDialogOpen, setDeleteOpen] = React.useState(false);
   const [editDialogOpen, setEditOpen] = React.useState(false);
   const [pagination, setPagination] = React.useState({ rows: 10, page: 0 });
+
+  const [orderClothValidation, setOrderClothValidation] = useState<IClothId[]>([
+    {
+      clothId: 0,
+      amount: 0,
+      size: ClothSizes.S,
+    },
+  ]);
 
   const [order, setOrder] = React.useState<EnumSort>(EnumSort.asc);
   const [orderBy, setOrderBy] = React.useState('id');
@@ -194,22 +210,7 @@ const Order = (props: IOrderProps): JSX.Element => {
               errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
-            <Tooltip title='Перелік ID через ","'>
-              <span>
-                <TextValidator
-                  fullWidth
-                  variant={'outlined'}
-                  label="Список ID товарів"
-                  onChange={handleChangeCreateText}
-                  name="clothIdList"
-                  color="button"
-                  value={clothIdList}
-                  validators={['required']}
-                  errorMessages={["Це поле обов'язкове"]}
-                  className="formElem"
-                />
-              </span>
-            </Tooltip>
+            {OrderClothSizes()}
             <FormControl fullWidth className="formElem">
               <InputLabel id="demo-simple-select-label" color="button">
                 Статус замовлення
@@ -292,22 +293,7 @@ const Order = (props: IOrderProps): JSX.Element => {
               errorMessages={["Це поле обов'язкове"]}
               className="formElem"
             />
-            <Tooltip title='Перелік ID через ","'>
-              <span>
-                <TextValidator
-                  fullWidth
-                  variant={'outlined'}
-                  label="Список ID товарів"
-                  onChange={handleChangeEditText}
-                  name="clothIdList"
-                  color="button"
-                  value={editClothIdList}
-                  validators={['required']}
-                  errorMessages={["Це поле обов'язкове"]}
-                  className="formElem"
-                />
-              </span>
-            </Tooltip>
+            {OrderClothSizes()}
             <FormControl fullWidth className="formElem">
               <InputLabel id="demo-simple-select-label" color="button">
                 Статус замовлення
@@ -402,20 +388,153 @@ const Order = (props: IOrderProps): JSX.Element => {
     );
   };
 
+  const OrderClothSizes = () => {
+    return (
+      <Grid container className="clothDeliverySizesBox">
+        {orderClothValidation.map((clothDeliver, i) => {
+          return (
+            <Grid item xs={4} key={i}>
+              <Paper className="orderClothPaper" elevation={3}>
+                <TextValidator
+                  fullWidth
+                  variant={'outlined'}
+                  size="small"
+                  label="ID одягу"
+                  onChange={handleClothDeliverChange(i)}
+                  name="clothId"
+                  color="button"
+                  value={clothDeliver.clothId}
+                  validators={['required', 'minNumber:1']}
+                  errorMessages={[
+                    "Це поле обов'язкове",
+                    'Мінімальне значення - 1',
+                  ]}
+                  className="formElem"
+                  onFocus={(event: any) => {
+                    event.target.select();
+                  }}
+                  type="number"
+                />
+                <TextValidator
+                  fullWidth
+                  variant={'outlined'}
+                  size="small"
+                  label="Кількість одягу"
+                  onChange={handleClothDeliverChange(i)}
+                  name="amount"
+                  color="button"
+                  value={clothDeliver.amount}
+                  validators={['required', 'minNumber:1']}
+                  errorMessages={[
+                    "Це поле обов'язкове",
+                    'Мінімальне значення - 1',
+                  ]}
+                  className="formElem"
+                  onFocus={(event: any) => {
+                    event.target.select();
+                  }}
+                  type="number"
+                />
+                <FormControl fullWidth className="formElem">
+                  <InputLabel id="demo-simple-select-label" color="button">
+                    Розмір
+                  </InputLabel>
+                  <Select
+                    labelId="demo-simple-select-label"
+                    id="demo-simple-select"
+                    value={clothDeliver.size}
+                    label="Розмір"
+                    color="button"
+                    name="size"
+                    onChange={handleClothDeliverChange(i)}
+                  >
+                    <MenuItem value={ClothSizes.XS}>{ClothSizes.XS}</MenuItem>
+                    <MenuItem value={ClothSizes.S}>{ClothSizes.S}</MenuItem>
+                    <MenuItem value={ClothSizes.M}>{ClothSizes.M}</MenuItem>
+                    <MenuItem value={ClothSizes.L}>{ClothSizes.L}</MenuItem>
+                    <MenuItem value={ClothSizes.XL}>{ClothSizes.XL}</MenuItem>
+                    <MenuItem value={ClothSizes.XXL}>{ClothSizes.XXL}</MenuItem>
+                  </Select>
+                </FormControl>
+                <Grid container justifyContent="space-evenly">
+                  {orderClothValidation.length === i + 1 ? (
+                    <Button color="button" onClick={handleAddClothDeliver(i)}>
+                      Додати товар
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+                  <Button color="error" onClick={handleRemoveClothDeliver(i)}>
+                    Видалити
+                  </Button>
+                </Grid>
+              </Paper>
+            </Grid>
+          );
+        })}
+      </Grid>
+    );
+  };
+
+  const handleClothDeliverChange = (id: number) => (event: any) => {
+    setOrderClothValidation(
+      orderClothValidation.map((clothDeliver, i) => {
+        if (i === id) {
+          return {
+            ...clothDeliver,
+            [event.target.name]:
+              event.target.name === 'status'
+                ? event.target.value
+                : parseInt(event.target.value),
+          };
+        }
+
+        return clothDeliver;
+      }),
+    );
+  };
+
+  const handleAddClothDeliver = (id: number) => () => {
+    if (orderClothValidation.length !== id + 1) {
+      return;
+    }
+    setOrderClothValidation([
+      ...orderClothValidation,
+      {
+        clothId: 0,
+        amount: 0,
+        size: ClothSizes.S,
+      },
+    ]);
+  };
+
+  const handleRemoveClothDeliver = (id: number) => () => {
+    if (orderClothValidation.length === 1) {
+      return;
+    }
+    setOrderClothValidation([
+      ...orderClothValidation.filter((clothDeliver, i) => {
+        if (i === id) {
+          return false;
+        }
+        return true;
+      }),
+    ]);
+  };
+
   const updateOrderList = (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
     props.getOrderThunk({
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        clientId: filter.clientId,
-        clothIdList: filter.clothIdList,
-        status: filter.status,
+        id: parseInt(filter.id) || undefined,
+        clientId: filter.clientId || undefined,
+        status: filter.status || undefined,
       },
       sort: {
         order: orderString,
@@ -428,19 +547,23 @@ const Order = (props: IOrderProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateOrder = () => {
+  const handleCreateOrder = async () => {
     const createOrderData = {
       clientId: createValidation.clientId,
-      clothIdList: createValidation.clothIdList,
+      clothIdList: orderClothValidation.map((clothId) => ({
+        amount: clothId.amount,
+        clothId: clothId.clothId,
+        size: clothId.size,
+      })),
       status: createValidation.status,
     } as IOrderCreate;
 
-    props.createOrderThunk(createOrderData);
+    await props.createOrderThunk(createOrderData);
     updateOrderList(pagination.rows, pagination.page);
     handleCreateDialogClose();
   };
 
-  const handleEditOrder = () => {
+  const handleEditOrder = async () => {
     const OrderChanged = orders.find((order) => order.id === editValidation.id);
 
     if (!OrderChanged) {
@@ -449,14 +572,22 @@ const Order = (props: IOrderProps): JSX.Element => {
     }
 
     let isClothIdListChanged =
-      OrderChanged.clothIdList.length !== editValidation.clothIdList.length;
+      OrderChanged.clothIdList.length !== orderClothValidation.length;
 
     if (!isClothIdListChanged) {
-      isClothIdListChanged = editValidation.clothIdList.reduce((prev, cur) => {
+      isClothIdListChanged = orderClothValidation.reduce((prev, cur) => {
         if (prev) {
           return prev;
         }
-        if (OrderChanged.clothIdList.indexOf(cur) === -1) {
+
+        if (
+          OrderChanged.clothIdList.find(
+            (clothId) =>
+              clothId.amount !== cur.amount ||
+              clothId.clothId !== cur.clothId ||
+              clothId.size !== cur.size,
+          )
+        ) {
           return true;
         }
         return false;
@@ -469,16 +600,14 @@ const Order = (props: IOrderProps): JSX.Element => {
         editValidation.clientId !== OrderChanged.clientId
           ? editValidation.clientId
           : undefined,
-      clothIdList: isClothIdListChanged
-        ? editValidation.clothIdList
-        : undefined,
+      clothIdList: isClothIdListChanged ? orderClothValidation : undefined,
       status:
         editValidation.status !== OrderChanged.status
           ? editValidation.status
           : undefined,
     } as IOrderUpdate;
 
-    props.updateOrderThunk(editOrderData);
+    await props.updateOrderThunk(editOrderData);
     updateOrderList(pagination.rows, pagination.page);
     handleEditDialogClose();
   };
@@ -491,18 +620,24 @@ const Order = (props: IOrderProps): JSX.Element => {
     setCreateOpen(false);
     setCreateValidation({
       clientId: '',
-      clothIdList: [],
       status: OrderStatuses.CREATED,
     });
+    setOrderClothValidation([
+      {
+        clothId: 0,
+        amount: 0,
+        size: ClothSizes.S,
+      },
+    ]);
   };
 
   const handleClickEditDialogOpen = (order: IOrder) => {
     setEditValidation({
       id: order.id,
       clientId: order.clientId,
-      clothIdList: order.clothIdList,
       status: order.status,
     });
+    setOrderClothValidation(order.clothIdList);
     setEditOpen(true);
   };
 
@@ -511,9 +646,15 @@ const Order = (props: IOrderProps): JSX.Element => {
     setEditValidation({
       id: NaN,
       clientId: '',
-      clothIdList: [],
       status: '' as OrderStatuses,
     });
+    setOrderClothValidation([
+      {
+        clothId: 0,
+        amount: 0,
+        size: ClothSizes.S,
+      },
+    ]);
   };
 
   const handleClickDeleteDialogOpen = (id: number) => {
@@ -526,8 +667,8 @@ const Order = (props: IOrderProps): JSX.Element => {
     setDeleteValidation({ id: NaN });
   };
 
-  const handleDeleteOrder = (id: number) => () => {
-    props.deleteOrderThunk({ id });
+  const handleDeleteOrder = (id: number) => async () => {
+    await props.deleteOrderThunk({ id });
     updateOrderList(pagination.rows, pagination.page);
     handleDeleteDialogClose();
   };
@@ -564,14 +705,14 @@ const Order = (props: IOrderProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateOrderList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -588,7 +729,6 @@ const Order = (props: IOrderProps): JSX.Element => {
     setFilter({
       id: '',
       clientId: '',
-      clothIdList: [] as string[],
       status: '' as OrderStatuses,
     });
   };
@@ -602,19 +742,14 @@ const Order = (props: IOrderProps): JSX.Element => {
     updateOrderList(pagination.rows, 0, orderString, property);
   };
 
-  const { clientId, clothIdList, status } = createValidation;
+  const { clientId, status } = createValidation;
 
   const { id: deleteId } = deleteValidation;
-  const {
-    clientId: editClientId,
-    clothIdList: editClothIdList,
-    status: editStatus,
-  } = editValidation;
+  const { clientId: editClientId, status: editStatus } = editValidation;
 
   const {
     id: filterId,
     clientId: filterClientId,
-    clothIdList: filterClothIdList,
     status: filterStatus,
   } = filter;
 
@@ -734,19 +869,7 @@ const Order = (props: IOrderProps): JSX.Element => {
                         name="clientId"
                         color="button"
                       />
-                      <Tooltip title='Перелік ID через ","'>
-                        <span>
-                          <TextField
-                            fullWidth
-                            label="Список ID товарів"
-                            className="drawerFilterElem"
-                            value={filterClothIdList}
-                            onChange={handleChangeFilterText}
-                            name="clothIdList"
-                            color="button"
-                          />
-                        </span>
-                      </Tooltip>
+                      {OrderClothSizes()}
                       <TextField
                         fullWidth
                         label="Статус замовлення"
@@ -794,8 +917,8 @@ const Order = (props: IOrderProps): JSX.Element => {
                   <TableCell align="center">
                     <Grid container justifyContent="center">
                       {order.clothIdList.map((clothId) => (
-                        <span key={clothId} className="sizeSpan">
-                          {clothId}
+                        <span key={clothId.clothId} className="sizeSpan">
+                          {clothId.clothId}
                         </span>
                       ))}
                     </Grid>
