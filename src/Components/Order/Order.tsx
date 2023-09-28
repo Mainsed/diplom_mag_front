@@ -325,6 +325,12 @@ const Order = (props: IOrderProps): JSX.Element => {
                 <MenuItem value={OrderStatuses.COMPLETED}>
                   {OrderStatuses.COMPLETED}
                 </MenuItem>
+                <MenuItem value={OrderStatuses.RETURNED}>
+                  {OrderStatuses.RETURNED}
+                </MenuItem>
+                <MenuItem value={OrderStatuses.CANCELED}>
+                  {OrderStatuses.CANCELED}
+                </MenuItem>
               </Select>
             </FormControl>
             <Grid
@@ -389,6 +395,7 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const OrderClothSizes = () => {
+    console.log(orderClothValidation)
     return (
       <Grid container className="clothDeliverySizesBox">
         {orderClothValidation.map((clothDeliver, i) => {
@@ -483,7 +490,7 @@ const Order = (props: IOrderProps): JSX.Element => {
           return {
             ...clothDeliver,
             [event.target.name]:
-              event.target.name === 'status'
+              ['status', 'size'].includes(event.target.name)
                 ? event.target.value
                 : parseInt(event.target.value),
           };

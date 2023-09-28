@@ -7,7 +7,9 @@ export enum OrderStatuses {
   PAYED = 'PAYED',
   SENT = 'SENT',
   DELIVERED = 'DELIVERED',
-  COMPLETED = 'COMPLETED'
+  COMPLETED = 'COMPLETED',
+  RETURNED = 'RETURNED',
+  CANCELED = 'CANCELED',
 }
 
 export interface IClothId {
