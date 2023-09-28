@@ -32,21 +32,21 @@ export interface IOrder {
 }
 
 export interface IOrderState {
-  order: IOrder[],
-  orderCount: number,
-  orderError?: string,
+  order: IOrder[];
+  orderCount: number;
+  orderError?: string;
 }
 
 export interface IOrderError {
-  error: string,
+  error: string;
 }
 
 export interface IOrderProps {
-  order: IOrderState,
-  getOrderThunk(orderGetData?: IOrderGet): void,
-  updateOrderThunk(orderToUpdate: IOrderUpdate): void,
-  createOrderThunk(orderToCreate: IOrderCreate): void,
-  deleteOrderThunk(orderToDelete: IOrderDelete): void,
+  order: IOrderState;
+  getOrderThunk(orderGetData?: IOrderGet): void;
+  updateOrderThunk(orderToUpdate: IOrderUpdate): void;
+  createOrderThunk(orderToCreate: IOrderCreate): void;
+  deleteOrderThunk(orderToDelete: IOrderDelete): void;
 }
 
 export interface IOrderCreate {
@@ -75,6 +75,6 @@ export interface IOrderGetFilter {
 export interface IOrderGet {
   limit?: number;
   page?: number;
-  filter?: IOrderGetFilter,
+  filter?: IOrderGetFilter;
   sort?: IGetSort
 }

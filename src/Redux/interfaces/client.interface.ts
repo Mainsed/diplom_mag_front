@@ -13,7 +13,7 @@ export interface IClient {
   id: number;
   name: string;
   email: string;
-  phoneNumber: string,
+  phoneNumber: string;
   size: ClothSizes;
   createdBy: string;
   createdAt: string;
@@ -23,27 +23,27 @@ export interface IClient {
 }
 
 export interface IClientState {
-  client: IClient[],
-  clientCount: number,
-  clientError?: string,
+  client: IClient[];
+  clientCount: number;
+  clientError?: string;
 }
 
 export interface IClientError {
-  error: string,
+  error: string;
 }
 
 export interface IClientProps {
-  client: IClientState,
-  getClientThunk(clientGetData?: IClientGet): void,
-  updateClientThunk(clientToUpdate: IClientUpdate): void,
-  createClientThunk(clientToCreate: IClientCreate): void,
-  deleteClientThunk(clientToDelete: IClientDelete): void,
+  client: IClientState;
+  getClientThunk(clientGetData?: IClientGet): void;
+  updateClientThunk(clientToUpdate: IClientUpdate): void;
+  createClientThunk(clientToCreate: IClientCreate): void;
+  deleteClientThunk(clientToDelete: IClientDelete): void;
 }
 
 export interface IClientCreate {
   name: string;
   email: string;
-  phoneNumber: string,
+  phoneNumber: string;
   size: ClothSizes;
 }
 
@@ -51,7 +51,7 @@ export interface IClientUpdate {
   id: number;
   name?: string;
   email?: string;
-  phoneNumber?: string,
+  phoneNumber?: string;
   size?: ClothSizes;
 }
 
@@ -63,13 +63,13 @@ export interface IClientGetFilter {
   id?: number;
   name?: string;
   email?: string;
-  phoneNumber?: string,
+  phoneNumber?: string;
   size?: ClothSizes;
 }
 
 export interface IClientGet {
   limit?: number;
   page?: number;
-  filter?: IClientGetFilter,
+  filter?: IClientGetFilter;
   sort?: IGetSort
 }

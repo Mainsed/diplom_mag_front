@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -84,10 +85,17 @@ const theme = createTheme({
 
 const Store = (props: IStoreProps): JSX.Element => {
   useEffect(() => {
-    props.getStoreThunk();
+    props.getStoreThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
   }, []);
 
-  const stores = props.store?.store || [];
+  const stores = props.store?.store;
   const storeCount = props.store.storeCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
@@ -106,6 +114,8 @@ const Store = (props: IStoreProps): JSX.Element => {
     address: '',
     isActive: false,
   });
+
+  const [loading, setLoading] = useState(false);
 
   const [deleteValidation, setDeleteValidation] = useState({
     id: NaN,
@@ -214,11 +224,18 @@ const Store = (props: IStoreProps): JSX.Element => {
                 color="error"
                 variant="contained"
                 onClick={handleCreateDialogClose}
+                disabled={loading}
               >
                 Відмінити
               </Button>
-              <Button type={'submit'} color="button" variant="contained">
+              <Button
+                type={'submit'}
+                color="button"
+                variant="contained"
+                disabled={loading}
+              >
                 Створити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -272,11 +289,18 @@ const Store = (props: IStoreProps): JSX.Element => {
                 color="error"
                 variant="contained"
                 onClick={handleEditDialogClose}
+                disabled={loading}
               >
                 Відмінити
               </Button>
-              <Button type={'submit'} color="button" variant="contained">
+              <Button
+                type={'submit'}
+                color="button"
+                variant="contained"
+                disabled={loading}
+              >
                 Змінити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -308,6 +332,7 @@ const Store = (props: IStoreProps): JSX.Element => {
               variant="contained"
               color="error"
               onClick={handleDeleteDialogClose}
+              disabled={loading}
             >
               Відмінити
             </Button>
@@ -315,8 +340,10 @@ const Store = (props: IStoreProps): JSX.Element => {
               variant="contained"
               color="button"
               onClick={handleDeleteStore(deleteId)}
+              disabled={loading}
             >
               Видалити
+              {loading ? <CircularProgress size={24} color="button" /> : ''}
             </Button>
           </Grid>
         </DialogContent>
@@ -324,19 +351,19 @@ const Store = (props: IStoreProps): JSX.Element => {
     );
   };
 
-  const updateStoreList = (
+  const updateStoreList = async (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
-    props.getStoreThunk({
+    await props.getStoreThunk({
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        address: filter.address,
-        isActive: filter.isActive,
+        id: parseInt(filter.id) || undefined,
+        address: filter.address || undefined,
+        isActive: filter.isActive || undefined,
       },
       sort: {
         order: orderString,
@@ -345,22 +372,29 @@ const Store = (props: IStoreProps): JSX.Element => {
     });
   };
 
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
   const handleDrawerOpenToggle = () => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateStore = () => {
+  const handleCreateStore = async () => {
+    handleSetLoading(true);
     const createStoreData = {
       address: createValidation.address,
       isActive: createValidation.isActive,
     } as IStoreCreate;
 
-    props.createStoreThunk(createStoreData);
+    await props.createStoreThunk(createStoreData);
     updateStoreList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
-  const handleEditStore = () => {
+  const handleEditStore = async () => {
+    handleSetLoading(true);
     const StoreChanged = stores.find((store) => store.id === editValidation.id);
 
     if (!StoreChanged) {
@@ -380,8 +414,9 @@ const Store = (props: IStoreProps): JSX.Element => {
           : undefined,
     } as IStoreUpdate;
 
-    props.updateStoreThunk(editStoreData);
+    await props.updateStoreThunk(editStoreData);
     updateStoreList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -425,9 +460,11 @@ const Store = (props: IStoreProps): JSX.Element => {
     setDeleteValidation({ id: NaN });
   };
 
-  const handleDeleteStore = (id: number) => () => {
-    props.deleteStoreThunk({ id });
+  const handleDeleteStore = (id: number) => async () => {
+    handleSetLoading(true);
+    await props.deleteStoreThunk({ id });
     updateStoreList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -468,24 +505,26 @@ const Store = (props: IStoreProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStoreList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
     updateStoreList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterStore = () => {
+  const handleFilterStore = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
-
-    updateStoreList(pagination.rows, 0);
+    await updateStoreList(pagination.rows, 0);
+    handleSetLoading(false);
+    handleDrawerOpenToggle();
   };
 
   const handleClearFilterStore = () => {
@@ -657,8 +696,14 @@ const Store = (props: IStoreProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterStore}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
@@ -674,6 +719,7 @@ const Store = (props: IStoreProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!stores ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {stores?.map((store) => {
               const menu = IsolatedMenu(store);

@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Collapse,
   Dialog,
   DialogContent,
@@ -88,11 +89,20 @@ const theme = createTheme({
 
 const Delivery = (props: IDeliveryProps): JSX.Element => {
   useEffect(() => {
-    props.getDeliveryThunk();
+    props.getDeliveryThunk({
+      page: pagination.page,
+      limit: pagination.rows,
+      sort: {
+        order,
+        orderBy,
+      },
+    });
   }, []);
 
-  const delivers = props.delivery?.delivery || [];
+  const delivers = props.delivery?.delivery;
   const deliveryCount = props.delivery.deliveryCount || 0;
+
+  const [loading, setLoading] = useState(false);
 
   const [createValidation, setCreateValidation] = useState({
     deliveredTo: '',
@@ -335,7 +345,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                 fullWidth
                 variant={'outlined'}
                 label="Доставка з"
-                onChange={handleChangeEditText}
+                disabled={true}
                 name="deliveredFrom"
                 color="button"
                 value={editDeliveredFrom}
@@ -350,7 +360,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
               fullWidth
               variant={'outlined'}
               label="Опис"
-              onChange={handleChangeEditText}
+              disabled={true}
               name="Доставка в"
               color="button"
               value={editDeliveredTo}
@@ -378,7 +388,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
             ) : (
               ''
             )}
-            {Clothdeliversizes()}
+            {Clothdeliversizes(true)}
             <Grid
               container
               justifyContent={'space-evenly'}
@@ -440,7 +450,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     );
   };
 
-  const Clothdeliversizes = () => {
+  const Clothdeliversizes = (disabled = false) => {
     return (
       <Grid container className="clothDeliverySizesBox">
         {clothDeliverValidation.map((clothDeliver, i) => {
@@ -458,6 +468,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                   variant={'outlined'}
                   size="small"
                   label="ID одягу"
+                  disabled={disabled}
                   onChange={handleClothDeliverChange(i)}
                   name="clothId"
                   color="button"
@@ -489,6 +500,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                       </Typography>
                       <TextValidator
                         label="Кількість"
+                        disabled={disabled}
                         size="small"
                         color="button"
                         name={size.size}
@@ -507,6 +519,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                       />{' '}
                       шт.
                       <IconButton
+                        disabled={disabled}
                         onClick={handleRemoveClothDeliverSize(i, size.size)}
                       >
                         <ClearIcon />
@@ -520,6 +533,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                       Новий розмір
                     </InputLabel>
                     <Select
+                      disabled={disabled}
                       labelId="select-label"
                       variant={'outlined'}
                       label="Новий розмір"
@@ -541,13 +555,21 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                 )}
                 <Grid container justifyContent="space-evenly">
                   {clothDeliverValidation.length === i + 1 ? (
-                    <Button color="button" onClick={handleAddClothDeliver(i)}>
+                    <Button
+                      color="button"
+                      onClick={handleAddClothDeliver(i)}
+                      disabled={disabled}
+                    >
                       Додати товар
                     </Button>
                   ) : (
                     ''
                   )}
-                  <Button color="error" onClick={handleRemoveClothDeliver(i)}>
+                  <Button
+                    color="error"
+                    onClick={handleRemoveClothDeliver(i)}
+                    disabled={disabled}
+                  >
                     Видалити
                   </Button>
                 </Grid>
@@ -559,6 +581,10 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     );
   };
 
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
   const handleColapseToggle = (deliveryId: number) => () => {
     if (colapseOpen.indexOf(deliveryId) !== -1) {
       setColapseOpen(colapseOpen.filter((colapse) => colapse !== deliveryId));
@@ -567,19 +593,19 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     }
   };
 
-  const updateDeliveryList = (
+  const updateDeliveryList = async (
     rows: number,
     page: number,
     orderString = order,
     orderByString = orderBy,
   ) => {
-    props.getDeliveryThunk({
+    await props.getDeliveryThunk({
       limit: rows,
       page: page,
       filter: {
-        id: parseInt(filter.id),
-        deliveredFrom: parseInt(filter.deliveredFrom),
-        deliveredTo: parseInt(filter.deliveredTo),
+        id: parseInt(filter.id) || undefined,
+        deliveredFrom: parseInt(filter.deliveredFrom) || undefined,
+        deliveredTo: parseInt(filter.deliveredTo) || undefined,
       },
       sort: {
         order: orderString,
@@ -592,7 +618,8 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     setShowDrawer(!showDrawer);
   };
 
-  const handleCreateDelivery = () => {
+  const handleCreateDelivery = async () => {
+    handleSetLoading(true);
     const createDeliveryData = {
       clothDelivered: clothDeliverValidation,
       deliveredTo: parseInt(createValidation.deliveredTo),
@@ -601,12 +628,14 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       price: parseInt(createValidation.price),
     } as IDeliveryCreate;
 
-    props.createDeliveryThunk(createDeliveryData);
+    await props.createDeliveryThunk(createDeliveryData);
     updateDeliveryList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
-  const handleEditDelivery = () => {
+  const handleEditDelivery = async () => {
+    handleSetLoading(true);
     const DeliveryChanged = delivers.find(
       (delivery) => delivery.id === parseInt(editValidation.id),
     );
@@ -636,8 +665,9 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
           : undefined,
     } as IDeliveryUpdate;
 
-    props.updateDeliveryThunk(editDeliveryData);
+    await props.updateDeliveryThunk(editDeliveryData);
     updateDeliveryList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -700,9 +730,11 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     setDeleteValidation({ id: NaN });
   };
 
-  const handleDeleteDelivery = (id: number) => () => {
-    props.deleteDeliveryThunk({ id });
+  const handleDeleteDelivery = (id: number) => async () => {
+    handleSetLoading(true);
+    await props.deleteDeliveryThunk({ id });
     updateDeliveryList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -833,10 +865,12 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
     updateDeliveryList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterDelivery = () => {
+  const handleFilterDelivery = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
+    await updateDeliveryList(pagination.rows, 0);
+    handleSetLoading(false);
     handleDrawerOpenToggle();
-    updateDeliveryList(pagination.rows, 0);
   };
 
   const handleClearFilterDelivery = () => {
@@ -990,14 +1024,21 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterDelivery}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
                         variant="contained"
                         onClick={handleClearFilterDelivery}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Очистити
                       </Button>
@@ -1007,6 +1048,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!delivers ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {delivers?.map((delivery) => {
               const menu = IsolatedMenu(delivery);

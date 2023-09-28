@@ -1,23 +1,23 @@
 export interface IAuth {
-  isAuthorized: boolean,
-  name?: string,
-  error?: string,
+  isAuthorized: boolean;
+  name?: string;
+  error?: string;
 }
 
 export interface ILogout {
-  error?: string,
+  error?: string;
 }
 
 export interface IAuthorize {
-  email: string,
-  password: string,
+  email: string;
+  password: string;
 }
 
 export interface IAuthState {
-  auth: IAuth,
+  auth: IAuth;
 }
 
 export interface IAuthProps {
-  auth: IAuthState,
-  authorizeThunk(authData: IAuthorize): void,
+  auth: IAuthState;
+  authorizeThunk(authData: IAuthorize): void;
 }

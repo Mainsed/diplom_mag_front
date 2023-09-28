@@ -6,7 +6,7 @@ export interface IStaff {
   email: string;
   isAdmin: boolean;
   password: string;
-  position: string,
+  position: string;
   storeId: number;
   createdBy: string;
   createdAt: string;
@@ -16,27 +16,27 @@ export interface IStaff {
 }
 
 export interface IStaffState {
-  staff: IStaff[],
-  staffCount: number,
-  staffError?: string,
+  staff: IStaff[];
+  staffCount: number;
+  staffError?: string;
 }
 
 export interface IStaffError {
-  error: string,
+  error: string;
 }
 
 export interface IStaffProps {
-  staff: IStaffState,
-  getStaffThunk(staffGetData: IStaffGet): void,
-  updateStaffThunk(staffToUpdate: IStaffUpdate): void,
-  createStaffThunk(staffToCreate: IStaffCreate): void,
-  deleteStaffThunk(staffToDelete: IStaffDelete): void,
+  staff: IStaffState;
+  getStaffThunk(staffGetData: IStaffGet): void;
+  updateStaffThunk(staffToUpdate: IStaffUpdate): void;
+  createStaffThunk(staffToCreate: IStaffCreate): void;
+  deleteStaffThunk(staffToDelete: IStaffDelete): void;
 }
 
 export interface IStaffCreate {
   name: string;
   email: string;
-  position: string,
+  position: string;
   isAdmin: boolean;
   password?: string;
   storeId: number;
@@ -46,7 +46,7 @@ export interface IStaffUpdate {
   id: number;
   name?: string;
   email?: string;
-  position?: string,
+  position?: string;
   isAdmin?: boolean;
   password?: string;
   storeId?: number;
@@ -60,7 +60,7 @@ export interface IStaffGetFilter {
   id?: number;
   name?: string;
   email?: string;
-  position?: string,
+  position?: string;
   isAdmin?: boolean;
   storeId?: number;
 }
@@ -68,6 +68,6 @@ export interface IStaffGetFilter {
 export interface IStaffGet {
   limit: number;
   page: number;
-  filter?: IStaffGetFilter,
-  sort?: IGetSort,
+  filter?: IStaffGetFilter;
+  sort?: IGetSort;
 }

@@ -40,7 +40,7 @@ type GetStaffActionType = {
 }
 
 type SetErrorActionType = {
-  type: typeof SET_STAFF_ERROR;
+  type: typeof SET_STAFF_ERROR; 
   data: string;
 }
 

@@ -12,16 +12,21 @@ export interface IStore {
 }
 
 export interface IStoreState {
-  store: IStore[],
-  storeCount: number,
+  store: IStore[];
+  storeCount: number;
+  storeError?: string;
+}
+
+export interface IStoreError {
+  error: string;
 }
 
 export interface IStoreProps {
-  store: IStoreState,
-  getStoreThunk(storeGetData?: IStoreGet): void,
-  updateStoreThunk(storeToUpdate: IStoreUpdate): void,
-  createStoreThunk(storeToCreate: IStoreCreate): void,
-  deleteStoreThunk(storeToDelete: IStoreDelete): void,
+  store: IStoreState;
+  getStoreThunk(storeGetData?: IStoreGet): void;
+  updateStoreThunk(storeToUpdate: IStoreUpdate): void;
+  createStoreThunk(storeToCreate: IStoreCreate): void;
+  deleteStoreThunk(storeToDelete: IStoreDelete): void;
 }
 
 export interface IStoreCreate {
@@ -48,6 +53,6 @@ export interface IStoreGetFilter {
 export interface IStoreGet {
   limit?: number;
   page?: number;
-  filter?: IStoreGetFilter,
+  filter?: IStoreGetFilter;
   sort?: IGetSort
 }

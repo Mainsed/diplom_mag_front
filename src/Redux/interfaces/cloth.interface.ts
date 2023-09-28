@@ -17,7 +17,7 @@ export interface IClothSizeInShops {
 }
 
 export interface IClothError {
-  error: string,
+  error: string;
 }
 
 export interface ICloth {
@@ -41,11 +41,11 @@ export interface IClothState {
 }
 
 export interface IClothProps {
-  cloth: IClothState,
-  getClothThunk(clothGetData?: IClothGet): void,
-  updateClothThunk(clothToUpdate: IClothUpdate): void,
-  createClothThunk(clothToCreate: IClothCreate): void,
-  deleteClothThunk(clothToDelete: IClothDelete): void,
+  cloth: IClothState;
+  getClothThunk(clothGetData?: IClothGet): void;
+  updateClothThunk(clothToUpdate: IClothUpdate): void;
+  createClothThunk(clothToCreate: IClothCreate): void;
+  deleteClothThunk(clothToDelete: IClothDelete): void;
   getClothSizesThunk(clothId: number): void
 }
 
@@ -79,6 +79,6 @@ export interface IClothGetFilter {
 export interface IClothGet {
   limit?: number;
   page?: number;
-  filter?: IClothGetFilter,
-  sort?: IGetSort,
+  filter?: IClothGetFilter;
+  sort?: IGetSort;
 }

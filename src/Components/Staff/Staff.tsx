@@ -1,6 +1,7 @@
 import {
   Button,
   Checkbox,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -105,7 +106,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     });
   }, []);
 
-  const staff = props.staff.staff || [];
+  const staff = props.staff.staff;
   const staffCount = props.staff.staffCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
@@ -136,6 +137,8 @@ const Staff = (props: IStaffProps): JSX.Element => {
     position: '',
     storeId: '',
   });
+
+  const [loading, setLoading] = useState(false);
 
   const [adminValidation, setAdminValidation] = useState({
     id: NaN,
@@ -310,7 +313,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 validators={['isPassword']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
+                errorMessages={[
+                  'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
+                ]}
                 className="formElem"
                 InputProps={{
                   // <-- This is where the toggle button is added.
@@ -348,6 +353,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               </Button>
               <Button type={'submit'} color="button" variant="contained">
                 Створити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -442,7 +448,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 type={showPassword ? 'text' : 'password'}
                 value={editPassword}
                 validators={['isPassword']}
-                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
+                errorMessages={[
+                  'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
+                ]}
                 className="formElem"
               />
             ) : (
@@ -462,6 +470,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               </Button>
               <Button type={'submit'} color="button" variant="contained">
                 Змінити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -502,6 +511,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               onClick={handleDeleteStaff(deleteId)}
             >
               Видалити
+              {loading ? <CircularProgress size={24} color="button" /> : ''}
             </Button>
           </Grid>
         </DialogContent>
@@ -541,6 +551,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               onClick={handleRemoveAdmin(adminId)}
             >
               Забрати права адміністратора
+              {loading ? <CircularProgress size={24} color="button" /> : ''}
             </Button>
           </Grid>
         </DialogContent>
@@ -576,7 +587,9 @@ const Staff = (props: IStaffProps): JSX.Element => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               validators={['isPassword']}
-              errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
+              errorMessages={[
+                'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
+              ]}
               className="formElem"
               InputProps={{
                 // <-- This is where the toggle button is added.
@@ -611,6 +624,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               </Button>
               <Button variant="contained" color="button" type={'submit'}>
                 Зробити адміністратором
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -619,11 +633,11 @@ const Staff = (props: IStaffProps): JSX.Element => {
     );
   };
 
-  const updateStaffList = (
+  const updateStaffList = async (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
     let { isAdmin } = filter;
 
@@ -634,7 +648,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
       isAdmin = undefined as any;
     }
 
-    props.getStaffThunk({
+    await props.getStaffThunk({
       limit: rows,
       page: page,
       filter: {
@@ -652,19 +666,27 @@ const Staff = (props: IStaffProps): JSX.Element => {
     });
   };
 
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
   const handleMakeAdmin = (adminId: number) => async () => {
+    handleSetLoading(true);
     await props.updateStaffThunk({
       id: adminId,
       isAdmin: true,
       password: adminValidation.password,
     });
     updateStaffList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleMakeAdminDialogClose();
   };
 
   const handleRemoveAdmin = (adminId: number) => async () => {
+    handleSetLoading(true);
     await props.updateStaffThunk({ id: adminId, isAdmin: false });
     updateStaffList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleRemoveAdminDialogClose();
   };
 
@@ -677,6 +699,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
   };
 
   const handleCreateStaff = async () => {
+    handleSetLoading(true);
     const createStaffData = {
       email: createValidation.email,
       isAdmin: createValidation.isAdmin,
@@ -691,10 +714,12 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
     await props.createStaffThunk(createStaffData);
     updateStaffList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
   const handleEditStaff = async () => {
+    handleSetLoading(true);
     const staffChanged = staff.find((staff) => staff.id === editValidation.id);
 
     if (!staffChanged) {
@@ -724,6 +749,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
     await props.updateStaffThunk(editStaffData);
     updateStaffList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -780,8 +806,10 @@ const Staff = (props: IStaffProps): JSX.Element => {
   };
 
   const handleDeleteStaff = (id: number) => async () => {
+    handleSetLoading(true);
     await props.deleteStaffThunk({ id });
     updateStaffList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -858,22 +886,24 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStaffList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
     updateStaffList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterStaff = () => {
+  const handleFilterStaff = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
-    updateStaffList(pagination.rows, 0);
+    await updateStaffList(pagination.rows, 0);
+    handleSetLoading(false);
     handleDrawerOpenToggle();
   };
 
@@ -1101,14 +1131,21 @@ const Staff = (props: IStaffProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterStaff}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
                         variant="contained"
                         onClick={handleClearFilterStaff}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Очистити
                       </Button>
@@ -1118,6 +1155,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!staff ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {staff?.map((staff) => {
               const menu = IsolatedMenu(staff);

@@ -1,11 +1,8 @@
 import { IAuth } from './auth.interface';
 
 export interface IAppProps {
-  auth: IAuth,
-  errors: string[],
-  setAuthorized(isAuthorized: boolean, userName?: string): void,
-  clearError(): void,
-  // clearStaffError(): void,
-  // clearClientError(): void,
-  // clearClothError(): void,
+  auth: IAuth;
+  errors: string[];
+  setAuthorized(isAuthorized: boolean, userName?: string): void;
+  clearError(): void;
 }

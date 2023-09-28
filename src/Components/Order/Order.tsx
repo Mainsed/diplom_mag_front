@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -30,7 +31,6 @@ import React, { useState, useEffect } from 'react';
 import {
   MoreHoriz as MoreHorizIcon,
   FilterAlt as FilterAltIcon,
-  Clear as ClearIcon,
 } from '@mui/icons-material';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import {
@@ -93,8 +93,10 @@ const Order = (props: IOrderProps): JSX.Element => {
       },
     });
   }, []);
-  const orders = props.order?.order || [];
+  const orders = props.order?.order;
   const orderCount = props.order?.orderCount || 0;
+
+  const [loading, setLoading] = useState(false);
 
   const [createValidation, setCreateValidation] = useState({
     clientId: '',
@@ -395,7 +397,7 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const OrderClothSizes = () => {
-    console.log(orderClothValidation)
+    console.log(orderClothValidation);
     return (
       <Grid container className="clothDeliverySizesBox">
         {orderClothValidation.map((clothDeliver, i) => {
@@ -483,16 +485,19 @@ const Order = (props: IOrderProps): JSX.Element => {
     );
   };
 
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
   const handleClothDeliverChange = (id: number) => (event: any) => {
     setOrderClothValidation(
       orderClothValidation.map((clothDeliver, i) => {
         if (i === id) {
           return {
             ...clothDeliver,
-            [event.target.name]:
-              ['status', 'size'].includes(event.target.name)
-                ? event.target.value
-                : parseInt(event.target.value),
+            [event.target.name]: ['status', 'size'].includes(event.target.name)
+              ? event.target.value
+              : parseInt(event.target.value),
           };
         }
 
@@ -529,13 +534,13 @@ const Order = (props: IOrderProps): JSX.Element => {
     ]);
   };
 
-  const updateOrderList = (
+  const updateOrderList = async (
     rows: number,
     page: number,
     orderString = order,
     orderByString = orderBy,
   ) => {
-    props.getOrderThunk({
+    await props.getOrderThunk({
       limit: rows,
       page: page,
       filter: {
@@ -551,10 +556,12 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const handleDrawerOpenToggle = () => {
+    console.log('123');
     setShowDrawer(!showDrawer);
   };
 
   const handleCreateOrder = async () => {
+    handleSetLoading(true);
     const createOrderData = {
       clientId: createValidation.clientId,
       clothIdList: orderClothValidation.map((clothId) => ({
@@ -567,10 +574,12 @@ const Order = (props: IOrderProps): JSX.Element => {
 
     await props.createOrderThunk(createOrderData);
     updateOrderList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
   const handleEditOrder = async () => {
+    handleSetLoading(true);
     const OrderChanged = orders.find((order) => order.id === editValidation.id);
 
     if (!OrderChanged) {
@@ -616,6 +625,7 @@ const Order = (props: IOrderProps): JSX.Element => {
 
     await props.updateOrderThunk(editOrderData);
     updateOrderList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -675,8 +685,10 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const handleDeleteOrder = (id: number) => async () => {
+    handleSetLoading(true);
     await props.deleteOrderThunk({ id });
     updateOrderList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -726,10 +738,12 @@ const Order = (props: IOrderProps): JSX.Element => {
     updateOrderList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterOrder = () => {
+  const handleFilterOrder = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
-
-    updateOrderList(pagination.rows, 0);
+    await updateOrderList(pagination.rows, 0);
+    handleSetLoading(false);
+    handleDrawerOpenToggle();
   };
 
   const handleClearFilterOrder = () => {
@@ -876,16 +890,48 @@ const Order = (props: IOrderProps): JSX.Element => {
                         name="clientId"
                         color="button"
                       />
-                      {OrderClothSizes()}
-                      <TextField
-                        fullWidth
-                        label="Статус замовлення"
-                        className="drawerFilterElem"
-                        value={filterStatus}
-                        onChange={handleChangeFilterText}
-                        name="status"
-                        color="button"
-                      />
+                      <FormControl fullWidth className="drawerFilterElem">
+                        <InputLabel
+                          id="demo-simple-select-label"
+                          color="button"
+                        >
+                          Статус замовлення
+                        </InputLabel>
+                        <Select
+                          labelId="demo-simple-select-label"
+                          id="demo-simple-select"
+                          value={filterStatus}
+                          label="Статус замовлення"
+                          color="button"
+                          name="status"
+                          onChange={handleChangeFilterText}
+                        >
+                          <MenuItem value={OrderStatuses.CREATED}>
+                            {OrderStatuses.CREATED}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.PROCESSING}>
+                            {OrderStatuses.PROCESSING}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.PAYED}>
+                            {OrderStatuses.PAYED}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.SENT}>
+                            {OrderStatuses.SENT}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.DELIVERED}>
+                            {OrderStatuses.DELIVERED}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.COMPLETED}>
+                            {OrderStatuses.COMPLETED}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.RETURNED}>
+                            {OrderStatuses.RETURNED}
+                          </MenuItem>
+                          <MenuItem value={OrderStatuses.CANCELED}>
+                            {OrderStatuses.CANCELED}
+                          </MenuItem>
+                        </Select>
+                      </FormControl>
                     </div>
                     <Grid
                       container
@@ -897,14 +943,21 @@ const Order = (props: IOrderProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterOrder}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
                         variant="contained"
                         onClick={handleClearFilterOrder}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Очистити
                       </Button>
@@ -914,6 +967,7 @@ const Order = (props: IOrderProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!orders ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {orders?.map((order) => {
               const menu = IsolatedMenu(order);

@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -75,6 +76,12 @@ declare module '@mui/material/TextField' {
   }
 }
 
+declare module '@mui/material/CircularProgress' {
+  interface CircularProgressPropsColorOverrides {
+    button: true;
+  }
+}
+
 // creating new colors
 const { palette } = createTheme();
 const { augmentColor } = palette;
@@ -98,8 +105,10 @@ const Client = (props: IClientProps): JSX.Element => {
     });
   }, []);
 
-  const clients = props.client?.client || [];
+  const clients = props.client?.client;
   const clientCount = props.client.clientCount || 0;
+
+  const [loading, setLoading] = useState(false);
 
   const [createValidation, setCreateValidation] = useState({
     email: '',
@@ -423,13 +432,17 @@ const Client = (props: IClientProps): JSX.Element => {
     );
   };
 
-  const updateClientList = (
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
+  const updateClientList = async (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
-    props.getClientThunk({
+    await props.getClientThunk({
       limit: rows,
       page: page,
       filter: {
@@ -451,6 +464,7 @@ const Client = (props: IClientProps): JSX.Element => {
   };
 
   const handleCreateClient = async () => {
+    handleSetLoading(true);
     const createClientData = {
       email: createValidation.email,
       name: createValidation.name,
@@ -460,12 +474,14 @@ const Client = (props: IClientProps): JSX.Element => {
 
     await props.createClientThunk(createClientData);
     await updateClientList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
   const handleEditClient = async () => {
+    handleSetLoading(true);
     const ClientChanged = clients.find(
-      (client) => client.id === editValidation.id
+      (client) => client.id === editValidation.id,
     );
 
     if (!ClientChanged) {
@@ -495,6 +511,7 @@ const Client = (props: IClientProps): JSX.Element => {
 
     await props.updateClientThunk(editClientData);
     await updateClientList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -545,8 +562,10 @@ const Client = (props: IClientProps): JSX.Element => {
   };
 
   const handleDeleteClient = (id: number) => async () => {
+    handleSetLoading(true);
     await props.deleteClientThunk({ id });
     await updateClientList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -573,24 +592,26 @@ const Client = (props: IClientProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateClientList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
     updateClientList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterClient = () => {
+  const handleFilterClient = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
-
-    updateClientList(pagination.rows, 0);
+    await updateClientList(pagination.rows, 0);
+    handleSetLoading(false);
+    handleDrawerOpenToggle();
   };
 
   const handleClearFilterClient = () => {
@@ -795,14 +816,21 @@ const Client = (props: IClientProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterClient}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
                         variant="contained"
                         onClick={handleClearFilterClient}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Очистити
                       </Button>
@@ -812,6 +840,7 @@ const Client = (props: IClientProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!clients ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {clients?.map((client) => {
               const menu = IsolatedMenu(client);
@@ -822,8 +851,12 @@ const Client = (props: IClientProps): JSX.Element => {
                   <TableCell align="center">{client.name}</TableCell>
                   <TableCell align="center">{client.phoneNumber}</TableCell>
                   <TableCell align="center">{client.size}</TableCell>
-                  <TableCell align="center">{client.updatedAt || client.createdAt}</TableCell>
-                  <TableCell align="center">{client.deletedBy || client.updatedBy || client.createdBy}</TableCell>
+                  <TableCell align="center">
+                    {client.updatedAt || client.createdAt}
+                  </TableCell>
+                  <TableCell align="center">
+                    {client.deletedBy || client.updatedBy || client.createdBy}
+                  </TableCell>
                   <TableCell align="center">
                     <IconButton onClick={menu.handleMenuClick(client.id)}>
                       <MoreHorizIcon />

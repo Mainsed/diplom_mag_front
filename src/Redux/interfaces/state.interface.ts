@@ -8,12 +8,12 @@ import { IStaffState } from './staff.interface';
 import { IStoreState } from './store.interface';
 
 export interface IState {
-  staff: IStaffState,
-  client: IClientState,
-  cloth: IClothState,
-  order: IOrderState,
-  store: IStoreState,
-  delivery: IDeliveryState,
-  reports: IReportsState,
-  auth: IAuthState
+  staff: IStaffState;
+  client: IClientState;
+  cloth: IClothState;
+  order: IOrderState;
+  store: IStoreState;
+  delivery: IDeliveryState;
+  reports: IReportsState;
+  auth: IAuthState;
 }

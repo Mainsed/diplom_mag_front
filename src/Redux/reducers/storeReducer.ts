@@ -1,15 +1,14 @@
 import { Dispatch } from 'redux';
-import { IStore, IStoreCreate, IStoreDelete, IStoreGet, IStoreState, IStoreUpdate } from '../interfaces';
+import { IStoreCreate, IStoreDelete, IStoreGet, IStoreState, IStoreUpdate } from '../interfaces';
 import { StoreApi } from '../../Api/store.api';
 
 const initialState = {} as IStoreState;
 
-const CREATE_STORE = 'CREATE_STORE',
-  DELETE_STORE = 'DELETE_STORE',
+const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_STORE = 'GET_STORE',
-  UPDATE_STORE = 'UPDATE_STORE';
+  SET_STORE_ERROR = 'SET_STORE_ERROR';
 
-export type ActionTypes = GetStoreActionType | UpdateStoreActionType | CreateStoreActionType | DeleteStoreActionType
+export type ActionTypes = GetStoreActionType | SetErrorActionType | ClearErrorActionType
 
 const storeReducer = (state = initialState, action: ActionTypes): IStoreState => {
   switch (action.type) {
@@ -17,26 +16,15 @@ const storeReducer = (state = initialState, action: ActionTypes): IStoreState =>
       return action.data;
     }
 
-    case CREATE_STORE: {
-      const newState = { ...state };
-      newState.store.push(action.data);
-      return newState;
+    case CLEAR_ERROR: {
+      if (state.storeError === undefined) {
+        return state;
+      }
+      return { ...state, storeError: undefined };
     }
 
-    case DELETE_STORE: {
-      const newState = { ...state };
-      const newStore = newState.store.filter((store) => store.id !== action.data);
-      return { ...newState, store: newStore };
-    }
-
-    case UPDATE_STORE: {
-      const newStore = state.store.map((store) => {
-        if (store.id === action.data.id) {
-          store = action.data;
-        }
-        return store;
-      });
-      return { ...state, store: newStore };
+    case SET_STORE_ERROR: {
+      return { ...state, storeError: action.data };
     }
 
     default:
@@ -49,24 +37,24 @@ type GetStoreActionType = {
   data: IStoreState
 }
 
-type CreateStoreActionType = {
-  type: typeof CREATE_STORE;
-  data: IStore
+type SetErrorActionType = {
+  type: typeof SET_STORE_ERROR;
+  data: string;
 }
 
-type UpdateStoreActionType = {
-  type: typeof UPDATE_STORE;
-  data: IStore
-}
-
-type DeleteStoreActionType = {
-  type: typeof DELETE_STORE;
-  data: number
+type ClearErrorActionType = {
+  type: typeof CLEAR_ERROR;
+  data: undefined;
 }
 
 // thunks
 export const getStoreThunk = (storeData: IStoreGet) => async (dispatch: Dispatch<ActionTypes>) => {
   const storeResp = await StoreApi.getAllStore(storeData);
+
+  if ('error' in storeResp) {
+    dispatch({ type: SET_STORE_ERROR, data: storeResp.error });
+    return;
+  }
 
   dispatch({ type: GET_STORE, data: storeResp });
 };
@@ -74,19 +62,25 @@ export const getStoreThunk = (storeData: IStoreGet) => async (dispatch: Dispatch
 export const createStoreThunk = (storeToCreate: IStoreCreate) => async (dispatch: Dispatch<ActionTypes>) => {
   const store = await StoreApi.createStore(storeToCreate);
 
-  dispatch({ type: CREATE_STORE, data: store });
+  if ('error' in store) {
+    dispatch({ type: SET_STORE_ERROR, data: store.error });
+  }
 };
 
 export const updateStoreThunk = (storeToUpdate: IStoreUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
   const store = await StoreApi.updateStore(storeToUpdate);
 
-  dispatch({ type: UPDATE_STORE, data: store });
+  if ('error' in store) {
+    dispatch({ type: SET_STORE_ERROR, data: store.error });
+  }
 };
 
 export const deleteStoreThunk = (storeToDelete: IStoreDelete) => async (dispatch: Dispatch<ActionTypes>) => {
   const store = await StoreApi.deleteStore(storeToDelete);
 
-  dispatch({ type: DELETE_STORE, data: store });
+  if (typeof store === 'object') {
+    dispatch({ type: SET_STORE_ERROR, data: store.error });
+  }
 };
 
 export default storeReducer;

@@ -1,5 +1,6 @@
 import {
   Button,
+  CircularProgress,
   Collapse,
   Dialog,
   DialogContent,
@@ -94,8 +95,10 @@ const Cloth = (props: IClothProps): JSX.Element => {
     });
   }, []);
 
-  const cloths = props.cloth?.cloth || [];
+  const cloths = props.cloth?.cloth;
   const clothCount = props.cloth.clothCount || 0;
+
+  const [loading, setLoading] = useState(false);
 
   const [createValidation, setCreateValidation] = useState({
     desc: '',
@@ -419,6 +422,10 @@ const Cloth = (props: IClothProps): JSX.Element => {
     );
   };
 
+  const handleSetLoading = (loading: boolean) => {
+    setLoading(loading);
+  };
+
   const handleColapseToggle = (clothId: number) => async () => {
     if (colapseOpen.indexOf(clothId) !== -1) {
       setColapseOpen(colapseOpen.filter((colapse) => colapse !== clothId));
@@ -428,13 +435,13 @@ const Cloth = (props: IClothProps): JSX.Element => {
     }
   };
 
-  const updateClothList = (
+  const updateClothList = async (
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy
+    orderByString = orderBy,
   ) => {
-    props.getClothThunk({
+    await props.getClothThunk({
       limit: rows,
       page: page,
       filter: {
@@ -456,6 +463,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
   };
 
   const handleCreateCloth = async () => {
+    handleSetLoading(true);
     const createClothData = {
       desc: createValidation.desc,
       name: createValidation.name,
@@ -465,10 +473,12 @@ const Cloth = (props: IClothProps): JSX.Element => {
 
     await props.createClothThunk(createClothData);
     updateClothList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleCreateDialogClose();
   };
 
   const handleEditCloth = async () => {
+    handleSetLoading(true);
     const ClothChanged = cloths.find((cloth) => cloth.id === editValidation.id);
 
     if (!ClothChanged) {
@@ -498,6 +508,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
 
     await props.updateClothThunk(editClothData);
     updateClothList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleEditDialogClose();
   };
 
@@ -548,8 +559,10 @@ const Cloth = (props: IClothProps): JSX.Element => {
   };
 
   const handleDeleteCloth = (id: number) => async () => {
+    handleSetLoading(true);
     await props.deleteClothThunk({ id });
     updateClothList(pagination.rows, pagination.page);
+    handleSetLoading(false);
     handleDeleteDialogClose();
   };
 
@@ -576,24 +589,26 @@ const Cloth = (props: IClothProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number
+    newPage: number,
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateClothList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
     updateClothList(parseInt(event.target.value, 10), 0);
   };
 
-  const handleFilterCloth = () => {
+  const handleFilterCloth = async () => {
+    handleSetLoading(true);
     setPagination({ ...pagination, page: 0 });
+    await updateClothList(pagination.rows, 0);
+    handleSetLoading(false);
     handleDrawerOpenToggle();
-    updateClothList(pagination.rows, 0);
   };
 
   const handleClearFilterCloth = () => {
@@ -786,14 +801,21 @@ const Cloth = (props: IClothProps): JSX.Element => {
                         variant="contained"
                         onClick={handleFilterCloth}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Застосувати
+                        {loading ? (
+                          <CircularProgress size={24} color="button" />
+                        ) : (
+                          ''
+                        )}
                       </Button>
                       <Button
                         color="button"
                         variant="contained"
                         onClick={handleClearFilterCloth}
                         className="filterButton"
+                        disabled={loading}
                       >
                         Очистити
                       </Button>
@@ -803,6 +825,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
               </TableCell>
             </TableRow>
           </TableHead>
+          {!cloths ? <CircularProgress color="button" /> : ''}
           <TableBody>
             {cloths?.map((cloth) => {
               const menu = IsolatedMenu(cloth);
@@ -857,46 +880,46 @@ const Cloth = (props: IClothProps): JSX.Element => {
                       >
                         <Paper className="shopSizesWrap" elevation={3}>
                           {props.cloth?.sizesByShop?.find(
-                            (clothByShops) => clothByShops.clothId === cloth.id
+                            (clothByShops) => clothByShops.clothId === cloth.id,
                           )?.shops?.length ? (
-                              <>
-                                <Typography align="center">
-                                Кількість товару в магазинах
-                                </Typography>
-                                <Grid container>
-                                  {props.cloth?.sizesByShop
-                                    ?.find(
-                                      (clothByShops) =>
-                                        clothByShops.clothId === cloth.id
-                                    )
-                                    ?.shops.map((shop, i) => (
-                                      <Grid item xs={6} md={4} lg={3} key={i}>
-                                        <Grid container justifyContent="center">
-                                          <Paper
-                                            className="shopSizes"
-                                            elevation={3}
-                                          >
-                                            <Typography align="center">
-                                            Номер магазину: {shop.shopId}
-                                            </Typography>
-                                            {shop.sizes.map((size) => (
-                                              <Grid key={size.size + shop.shopId}>
-                                                <Typography align="center">
-                                                  {size.size}: {size.count} шт.
-                                                </Typography>
-                                              </Grid>
-                                            ))}
-                                          </Paper>
-                                        </Grid>
-                                      </Grid>
-                                    ))}
-                                </Grid>
-                              </>
-                            ) : (
+                            <>
                               <Typography align="center">
-                              Цього товару ще нема в магазинах
+                                Кількість товару в магазинах
                               </Typography>
-                            )}
+                              <Grid container>
+                                {props.cloth?.sizesByShop
+                                  ?.find(
+                                    (clothByShops) =>
+                                      clothByShops.clothId === cloth.id,
+                                  )
+                                  ?.shops.map((shop, i) => (
+                                    <Grid item xs={6} md={4} lg={3} key={i}>
+                                      <Grid container justifyContent="center">
+                                        <Paper
+                                          className="shopSizes"
+                                          elevation={3}
+                                        >
+                                          <Typography align="center">
+                                            Номер магазину: {shop.shopId}
+                                          </Typography>
+                                          {shop.sizes.map((size) => (
+                                            <Grid key={size.size + shop.shopId}>
+                                              <Typography align="center">
+                                                {size.size}: {size.count} шт.
+                                              </Typography>
+                                            </Grid>
+                                          ))}
+                                        </Paper>
+                                      </Grid>
+                                    </Grid>
+                                  ))}
+                              </Grid>
+                            </>
+                          ) : (
+                            <Typography align="center">
+                              Цього товару ще нема в магазинах
+                            </Typography>
+                          )}
                         </Paper>
                       </Collapse>
                     </TableCell>

@@ -26,12 +26,7 @@ export const StaffApi = {
               page: page,
               order: sort?.order,
               orderBy: sort?.orderBy,
-              email: filter?.email,
-              id: filter?.id,
-              isAdmin: filter?.isAdmin,
-              name: filter?.name,
-              position: filter?.position,
-              storeId: filter?.storeId,
+              ...filter,
             },
           }
         )

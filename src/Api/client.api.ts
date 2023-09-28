@@ -26,11 +26,7 @@ export const ClientApi = {
               page,
               order: sort?.order,
               orderBy: sort?.orderBy,
-              email: filter?.email,
-              id: filter?.id,
-              phoneNumber: filter?.phoneNumber,
-              name: filter?.name,
-              size: filter?.size,
+              ...filter,
             },
           }
         )

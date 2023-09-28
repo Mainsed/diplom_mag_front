@@ -27,10 +27,7 @@ export const ClothApi = {
               page,
               order: sort?.order,
               orderBy: sort?.orderBy,
-              desc: filter?.desc,
-              id: filter?.id,
-              price: filter?.price,
-              name: filter?.name,
+              ...filter,
             },
           }
         )

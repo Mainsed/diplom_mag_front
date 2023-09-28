@@ -18,11 +18,11 @@ export interface IClothDelivered {
 
 export interface IDelivery {
   id: number;
-  deliveredTo: number,
-  deliveredFrom?: number,
-  totalAmountDelivered: number,
-  typeOfDelivery: DeliveryType,
-  price?: number,
+  deliveredTo: number;
+  deliveredFrom?: number;
+  totalAmountDelivered: number;
+  typeOfDelivery: DeliveryType;
+  price?: number;
   clothDelivered: IClothDelivered[];
   createdBy: string;
   createdAt: string;
@@ -34,30 +34,35 @@ export interface IDelivery {
 export interface IDeliveryState {
   delivery: IDelivery[];
   deliveryCount: number;
+  deliveryError?: string;
+}
+
+export interface IDeliveryError {
+  error: string;
 }
 
 export interface IDeliveryProps {
-  delivery: IDeliveryState,
-  getDeliveryThunk(deliveryGetData?: IDeliveryGet): void,
-  updateDeliveryThunk(deliveryToUpdate: IDeliveryUpdate): void,
-  createDeliveryThunk(deliveryToCreate: IDeliveryCreate): void,
-  deleteDeliveryThunk(deliveryToDelete: IDeliveryDelete): void,
+  delivery: IDeliveryState;
+  getDeliveryThunk(deliveryGetData?: IDeliveryGet): void;
+  updateDeliveryThunk(deliveryToUpdate: IDeliveryUpdate): void;
+  createDeliveryThunk(deliveryToCreate: IDeliveryCreate): void;
+  deleteDeliveryThunk(deliveryToDelete: IDeliveryDelete): void;
   getDeliverySizesThunk(deliveryId: number): void
 }
 
 export interface IDeliveryCreate {
-  deliveredTo: number,
-  deliveredFrom?: number,
-  typeOfDelivery: DeliveryType,
-  price?: number,
+  deliveredTo: number;
+  deliveredFrom?: number;
+  typeOfDelivery: DeliveryType;
+  price?: number;
   clothDelivered: IClothDelivered[];
 }
 
 export interface IDeliveryUpdate {
   id: number;
-  deliveredTo?: number,
-  deliveredFrom?: number,
-  price?: number,
+  deliveredTo?: number;
+  deliveredFrom?: number;
+  price?: number;
   clothDelivered?: IClothDelivered[];
 }
 
@@ -67,13 +72,13 @@ export interface IDeliveryDelete {
 
 export interface IDeliveryGetFilter {
   id?: number;
-  deliveredTo?: number,
-  deliveredFrom?: number,
+  deliveredTo?: number;
+  deliveredFrom?: number;
 }
 
 export interface IDeliveryGet {
   limit?: number;
   page?: number;
-  filter?: IDeliveryGetFilter,
-  sort?: IGetSort,
+  filter?: IDeliveryGetFilter;
+  sort?: IGetSort;
 }

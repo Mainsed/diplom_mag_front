@@ -1,6 +1,5 @@
 import { Dispatch } from 'redux';
 import {
-  IDelivery,
   IDeliveryCreate,
   IDeliveryDelete,
   IDeliveryGet,
@@ -11,16 +10,14 @@ import { DeliveryApi } from '../../Api/delivery.api';
 
 const initialState = {} as IDeliveryState;
 
-const CREATE_DELIVERY = 'CREATE_DELIVERY',
-  DELETE_DELIVERY = 'DELETE_DELIVERY',
+const CLEAR_ERROR = 'CLEAR_ERROR',
   GET_DELIVERY = 'GET_DELIVERY',
-  UPDATE_DELIVERY = 'UPDATE_DELIVERY';
+  SET_DELIVERY_ERROR = 'SET_DELIVERY_ERROR';
 
 export type ActionTypes =
   GetDeliveryActionType |
-  UpdateDeliveryActionType |
-  CreateDeliveryActionType |
-  DeleteDeliveryActionType
+  SetErrorActionType |
+  ClearErrorActionType
 
 const deliveryReducer = (state = initialState, action: ActionTypes): IDeliveryState => {
   switch (action.type) {
@@ -28,26 +25,15 @@ const deliveryReducer = (state = initialState, action: ActionTypes): IDeliverySt
       return action.data;
     }
 
-    case CREATE_DELIVERY: {
-      const newState = { ...state };
-      newState.delivery.push(action.data);
-      return newState;
+    case CLEAR_ERROR: {
+      if (state.deliveryError === undefined) {
+        return state;
+      }
+      return { ...state, deliveryError: undefined };
     }
 
-    case DELETE_DELIVERY: {
-      const newState = { ...state };
-      const newDelivery = newState.delivery.filter((delivery) => delivery.id !== action.data);
-      return { ...newState, delivery: newDelivery };
-    }
-
-    case UPDATE_DELIVERY: {
-      const newDelivery = state.delivery.map((delivery) => {
-        if (delivery.id === action.data.id) {
-          delivery = action.data;
-        }
-        return delivery;
-      });
-      return { ...state, delivery: newDelivery };
+    case SET_DELIVERY_ERROR: {
+      return { ...state, deliveryError: action.data };
     }
 
     default:
@@ -60,24 +46,24 @@ type GetDeliveryActionType = {
   data: IDeliveryState
 }
 
-type CreateDeliveryActionType = {
-  type: typeof CREATE_DELIVERY;
-  data: IDelivery
+type SetErrorActionType = {
+  type: typeof SET_DELIVERY_ERROR;
+  data: string;
 }
 
-type UpdateDeliveryActionType = {
-  type: typeof UPDATE_DELIVERY;
-  data: IDelivery
-}
-
-type DeleteDeliveryActionType = {
-  type: typeof DELETE_DELIVERY;
-  data: number
+type ClearErrorActionType = {
+  type: typeof CLEAR_ERROR;
+  data: undefined;
 }
 
 // thunks
 export const getDeliveryThunk = (deliveryData: IDeliveryGet) => async (dispatch: Dispatch<ActionTypes>) => {
   const deliveryResp = await DeliveryApi.getAllDelivery(deliveryData);
+
+  if ('error' in deliveryResp) {
+    dispatch({ type: SET_DELIVERY_ERROR, data: deliveryResp.error });
+    return;
+  }
 
   dispatch({ type: GET_DELIVERY, data: deliveryResp });
 };
@@ -85,19 +71,25 @@ export const getDeliveryThunk = (deliveryData: IDeliveryGet) => async (dispatch:
 export const createDeliveryThunk = (deliveryToCreate: IDeliveryCreate) => async (dispatch: Dispatch<ActionTypes>) => {
   const delivery = await DeliveryApi.createDelivery(deliveryToCreate);
 
-  dispatch({ type: CREATE_DELIVERY, data: delivery });
+  if ('error' in delivery) {
+    dispatch({ type: SET_DELIVERY_ERROR, data: delivery.error });
+  }
 };
 
 export const updateDeliveryThunk = (deliveryToUpdate: IDeliveryUpdate) => async (dispatch: Dispatch<ActionTypes>) => {
   const delivery = await DeliveryApi.updateDelivery(deliveryToUpdate);
 
-  dispatch({ type: UPDATE_DELIVERY, data: delivery });
+  if ('error' in delivery) {
+    dispatch({ type: SET_DELIVERY_ERROR, data: delivery.error });
+  }
 };
 
 export const deleteDeliveryThunk = (deliveryToDelete: IDeliveryDelete) => async (dispatch: Dispatch<ActionTypes>) => {
   const delivery = await DeliveryApi.deleteDelivery(deliveryToDelete);
 
-  dispatch({ type: DELETE_DELIVERY, data: delivery });
+  if (typeof delivery === 'object') {
+    dispatch({ type: SET_DELIVERY_ERROR, data: delivery.error });
+  }
 };
 
 export default deliveryReducer;
