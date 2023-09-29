@@ -15,7 +15,6 @@ export const AuthApi = {
       if (auth.isAuthorized && auth.name && auth.accessToken) {
         Cookies.set('isAuthorized', auth.isAuthorized.toString());
         Cookies.set('userName', auth.name);
-        Cookies.set('accessToken', auth.accessToken);
       }
 
       return {
@@ -36,7 +35,6 @@ export const AuthApi = {
       await instance.post<ILogout>('auth/logout');
       Cookies.remove('isAuthorized');
       Cookies.remove('userName');
-      Cookies.remove('accessToken');
       return {};
     } catch (e) {
       const error = e as AxiosError<any>;
