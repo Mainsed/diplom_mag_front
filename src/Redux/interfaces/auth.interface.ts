@@ -2,6 +2,7 @@ export interface IAuth {
   isAuthorized: boolean;
   name?: string;
   error?: string;
+  accessToken?: string;
 }
 
 export interface ILogout {

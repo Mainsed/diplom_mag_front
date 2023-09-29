@@ -13,14 +13,11 @@ const App = (props: IAppProps) => {
   useEffect(() => {
     const isAuthorized = Cookies.get('isAuthorized');
     const userName = Cookies.get('userName');
-    console.log(isAuthorized, userName);
     props.setAuthorized(isAuthorized === 'true', userName);
   }, []);
 
   useEffect(() => {
     props.errors.forEach((error) => {
-      const all = Cookies.get();
-      console.log(all);
       enqueueSnackbar(error, {
         variant: 'error',
         autoHideDuration: 5000,
