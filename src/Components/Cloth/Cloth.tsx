@@ -439,7 +439,7 @@ const Cloth = (props: IClothProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     await props.getClothThunk({
       limit: rows,
@@ -589,14 +589,14 @@ const Cloth = (props: IClothProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateClothList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -880,46 +880,46 @@ const Cloth = (props: IClothProps): JSX.Element => {
                       >
                         <Paper className="shopSizesWrap" elevation={3}>
                           {props.cloth?.sizesByShop?.find(
-                            (clothByShops) => clothByShops.clothId === cloth.id,
+                            (clothByShops) => clothByShops.clothId === cloth.id
                           )?.shops?.length ? (
-                            <>
-                              <Typography align="center">
+                              <>
+                                <Typography align="center">
                                 Кількість товару в магазинах
-                              </Typography>
-                              <Grid container>
-                                {props.cloth?.sizesByShop
-                                  ?.find(
-                                    (clothByShops) =>
-                                      clothByShops.clothId === cloth.id,
-                                  )
-                                  ?.shops.map((shop, i) => (
-                                    <Grid item xs={6} md={4} lg={3} key={i}>
-                                      <Grid container justifyContent="center">
-                                        <Paper
-                                          className="shopSizes"
-                                          elevation={3}
-                                        >
-                                          <Typography align="center">
+                                </Typography>
+                                <Grid container>
+                                  {props.cloth?.sizesByShop
+                                    ?.find(
+                                      (clothByShops) =>
+                                        clothByShops.clothId === cloth.id
+                                    )
+                                    ?.shops.map((shop, i) => (
+                                      <Grid item xs={6} md={4} lg={3} key={i}>
+                                        <Grid container justifyContent="center">
+                                          <Paper
+                                            className="shopSizes"
+                                            elevation={3}
+                                          >
+                                            <Typography align="center">
                                             Номер магазину: {shop.shopId}
-                                          </Typography>
-                                          {shop.sizes.map((size) => (
-                                            <Grid key={size.size + shop.shopId}>
-                                              <Typography align="center">
-                                                {size.size}: {size.count} шт.
-                                              </Typography>
-                                            </Grid>
-                                          ))}
-                                        </Paper>
+                                            </Typography>
+                                            {shop.sizes.map((size) => (
+                                              <Grid key={size.size + shop.shopId}>
+                                                <Typography align="center">
+                                                  {size.size}: {size.count} шт.
+                                                </Typography>
+                                              </Grid>
+                                            ))}
+                                          </Paper>
+                                        </Grid>
                                       </Grid>
-                                    </Grid>
-                                  ))}
-                              </Grid>
-                            </>
-                          ) : (
-                            <Typography align="center">
+                                    ))}
+                                </Grid>
+                              </>
+                            ) : (
+                              <Typography align="center">
                               Цього товару ще нема в магазинах
-                            </Typography>
-                          )}
+                              </Typography>
+                            )}
                         </Paper>
                       </Collapse>
                     </TableCell>

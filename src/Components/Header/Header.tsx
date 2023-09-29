@@ -38,7 +38,7 @@ const Header = (props: IHeaderProps) => {
         </NavLink>
       </Grid>
       <Grid item xs={3} className="headerElem">
-        <Typography align="center" variant="h5">
+        <Typography align="center" variant="h4">
           Company name
         </Typography>
       </Grid>
@@ -46,7 +46,7 @@ const Header = (props: IHeaderProps) => {
         {props.isAuthorized ? (
           <Grid container justifyContent={'flex-end'}>
             <Button onClick={handleClick}>
-              <Avatar alt="Person img">{props.name && props.name[0]}</Avatar>
+              <Avatar alt="Person img" sx={{ width: 56, height: 56 }}>{props.name && props.name[0]}</Avatar>
             </Button>
             <Menu
               id="basic-menu"

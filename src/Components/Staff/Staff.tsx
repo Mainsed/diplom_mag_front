@@ -106,7 +106,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     });
   }, []);
 
-  const staff = props.staff.staff;
+  const { staff } = props.staff;
   const staffCount = props.staff.staffCount || 0;
 
   const [createValidation, setCreateValidation] = useState({
@@ -313,9 +313,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 type={showPassword ? 'text' : 'password'}
                 value={password}
                 validators={['isPassword']}
-                errorMessages={[
-                  'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
-                ]}
+                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
                 className="formElem"
                 InputProps={{
                   // <-- This is where the toggle button is added.
@@ -448,9 +446,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
                 type={showPassword ? 'text' : 'password'}
                 value={editPassword}
                 validators={['isPassword']}
-                errorMessages={[
-                  'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
-                ]}
+                errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
                 className="formElem"
               />
             ) : (
@@ -587,9 +583,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
               type={showPassword ? 'text' : 'password'}
               value={password}
               validators={['isPassword']}
-              errorMessages={[
-                'Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру',
-              ]}
+              errorMessages={['Мінімальна довжина паролю - 8 символів, має містити хоча б 1 букву та 1 цифру']}
               className="formElem"
               InputProps={{
                 // <-- This is where the toggle button is added.
@@ -637,7 +631,7 @@ const Staff = (props: IStaffProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     let { isAdmin } = filter;
 
@@ -886,14 +880,14 @@ const Staff = (props: IStaffProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStaffList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
     updateStaffList(parseInt(event.target.value, 10), 0);

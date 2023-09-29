@@ -258,8 +258,14 @@ const Order = (props: IOrderProps): JSX.Element => {
               >
                 Відмінити
               </Button>
-              <Button type={'submit'} color="button" variant="contained">
+              <Button
+                type={'submit'}
+                color="button"
+                variant="contained"
+                disabled={loading}
+              >
                 Створити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -347,8 +353,14 @@ const Order = (props: IOrderProps): JSX.Element => {
               >
                 Відмінити
               </Button>
-              <Button type={'submit'} color="button" variant="contained">
+              <Button
+                type={'submit'}
+                color="button"
+                variant="contained"
+                disabled={loading}
+              >
                 Змінити
+                {loading ? <CircularProgress size={24} color="button" /> : ''}
               </Button>
             </Grid>
           </ValidatorForm>
@@ -387,8 +399,10 @@ const Order = (props: IOrderProps): JSX.Element => {
               variant="contained"
               color="button"
               onClick={handleDeleteOrder(deleteId)}
+              disabled={loading}
             >
               Видалити
+              {loading ? <CircularProgress size={24} color="button" /> : ''}
             </Button>
           </Grid>
         </DialogContent>
@@ -397,7 +411,6 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const OrderClothSizes = () => {
-    console.log(orderClothValidation);
     return (
       <Grid container className="clothDeliverySizesBox">
         {orderClothValidation.map((clothDeliver, i) => {
@@ -502,7 +515,7 @@ const Order = (props: IOrderProps): JSX.Element => {
         }
 
         return clothDeliver;
-      }),
+      })
     );
   };
 
@@ -538,7 +551,7 @@ const Order = (props: IOrderProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     await props.getOrderThunk({
       limit: rows,
@@ -556,7 +569,6 @@ const Order = (props: IOrderProps): JSX.Element => {
   };
 
   const handleDrawerOpenToggle = () => {
-    console.log('123');
     setShowDrawer(!showDrawer);
   };
 
@@ -599,14 +611,14 @@ const Order = (props: IOrderProps): JSX.Element => {
         if (
           OrderChanged.clothIdList.find(
             (clothId) =>
-              clothId.amount !== cur.amount ||
-              clothId.clothId !== cur.clothId ||
-              clothId.size !== cur.size,
+              clothId.amount === cur.amount &&
+              clothId.clothId === cur.clothId &&
+              clothId.size === cur.size
           )
         ) {
-          return true;
+          return false;
         }
-        return false;
+        return true;
       }, false);
     }
 
@@ -724,14 +736,14 @@ const Order = (props: IOrderProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateOrderList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 
@@ -977,8 +989,8 @@ const Order = (props: IOrderProps): JSX.Element => {
                   <TableCell align="center">{order.clientId}</TableCell>
                   <TableCell align="center">
                     <Grid container justifyContent="center">
-                      {order.clothIdList.map((clothId) => (
-                        <span key={clothId.clothId} className="sizeSpan">
+                      {order.clothIdList.map((clothId, i) => (
+                        <span key={i} className="sizeSpan">
                           {clothId.clothId}
                         </span>
                       ))}

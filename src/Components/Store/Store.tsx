@@ -355,7 +355,7 @@ const Store = (props: IStoreProps): JSX.Element => {
     rows: number,
     page: number,
     orderString = order,
-    orderByString = orderBy,
+    orderByString = orderBy
   ) => {
     await props.getStoreThunk({
       limit: rows,
@@ -505,14 +505,14 @@ const Store = (props: IStoreProps): JSX.Element => {
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
-    newPage: number,
+    newPage: number
   ) => {
     setPagination({ ...pagination, page: newPage });
     updateStoreList(pagination.rows, newPage);
   };
 
   const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     setPagination({ rows: parseInt(event.target.value, 10), page: 0 });
 

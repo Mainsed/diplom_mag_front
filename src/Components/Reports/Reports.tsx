@@ -50,13 +50,15 @@ const Reports = (props: IReportsProps): JSX.Element => {
             </Typography>
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={4}>
-                <Typography align="center">Номер магазину</Typography>
+                <Typography align="center" fontWeight="bold">
+                  Номер магазину
+                </Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Кількість продажів</Typography>
+                <Typography align="center" fontWeight="bold">Кількість продажів</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Зміна продажів</Typography>
+                <Typography align="center" fontWeight="bold">Зміна продажів</Typography>
               </Grid>
             </Grid>
             <Divider
@@ -118,13 +120,13 @@ const Reports = (props: IReportsProps): JSX.Element => {
             </Typography>
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={4}>
-                <Typography align="center">Номер товару</Typography>
+                <Typography align="center" fontWeight="bold">Номер товару</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Кількість продажів</Typography>
+                <Typography align="center" fontWeight="bold">Кількість продажів</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Зміна продажів</Typography>
+                <Typography align="center" fontWeight="bold">Зміна продажів</Typography>
               </Grid>
             </Grid>
             <Divider
@@ -186,13 +188,13 @@ const Reports = (props: IReportsProps): JSX.Element => {
             </Typography>
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={4}>
-                <Typography align="center">Розмір</Typography>
+                <Typography align="center" fontWeight="bold">Розмір</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Кількість продажів</Typography>
+                <Typography align="center" fontWeight="bold">Кількість продажів</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Зміна продажів</Typography>
+                <Typography align="center" fontWeight="bold">Зміна продажів</Typography>
               </Grid>
             </Grid>
             <Divider
@@ -254,13 +256,13 @@ const Reports = (props: IReportsProps): JSX.Element => {
             </Typography>
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={4}>
-                <Typography align="center">Місяць</Typography>
+                <Typography align="center" fontWeight="bold">Місяць</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Найнято працівників</Typography>
+                <Typography align="center" fontWeight="bold">Найнято</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Звільнено працівників</Typography>
+                <Typography align="center" fontWeight="bold">Звільнено</Typography>
               </Grid>
             </Grid>
             <Divider
@@ -268,40 +270,40 @@ const Reports = (props: IReportsProps): JSX.Element => {
                 'border-color': '#78C091',
               }}
             />
-            {(props.reports?.reports?.staffChanges.staffChangesByMonth || []).map(
-              (income) => {
-                return (
-                  <Grid key={income.monthNumber}>
-                    <Grid
-                      container
-                      justifyContent="space-evenly"
-                      className="reportRow"
-                    >
-                      <Grid item xs={4}>
-                        <Typography align="center">
-                          {MonthNumber[income.monthNumber]}
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Typography align="center">
-                          {income.hiredStaffCount} чол.
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Typography align="center">
-                          {income.firedStaffCount} чол.
-                        </Typography>
-                      </Grid>
+            {(
+              props.reports?.reports?.staffChanges.staffChangesByMonth || []
+            ).map((income) => {
+              return (
+                <Grid key={income.monthNumber}>
+                  <Grid
+                    container
+                    justifyContent="space-evenly"
+                    className="reportRow"
+                  >
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {MonthNumber[income.monthNumber]}
+                      </Typography>
                     </Grid>
-                    <Divider
-                      sx={{
-                        'border-color': '#78C091',
-                      }}
-                    />
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {income.hiredStaffCount} чол.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Typography align="center">
+                        {income.firedStaffCount} чол.
+                      </Typography>
+                    </Grid>
                   </Grid>
-                );
-              }
-            )}
+                  <Divider
+                    sx={{
+                      'border-color': '#78C091',
+                    }}
+                  />
+                </Grid>
+              );
+            })}
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={8}>
                 <Typography align="center" variant="h6">
@@ -327,10 +329,10 @@ const Reports = (props: IReportsProps): JSX.Element => {
             </Typography>
             <Grid container justifyContent="space-evenly" className="reportRow">
               <Grid item xs={4}>
-                <Typography align="center">Місяць</Typography>
+                <Typography align="center" fontWeight="bold">Місяць</Typography>
               </Grid>
               <Grid item xs={4}>
-                <Typography align="center">Дохід</Typography>
+                <Typography align="center" fontWeight="bold">Дохід</Typography>
               </Grid>
             </Grid>
             <Divider

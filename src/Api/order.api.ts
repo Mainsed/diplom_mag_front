@@ -1,6 +1,5 @@
 import { AxiosError } from 'axios';
 import {
-  ClothSizes,
   IOrder,
   IOrderCreate,
   IOrderDelete,
@@ -8,9 +7,7 @@ import {
   IOrderGet,
   IOrderState,
   IOrderUpdate,
-  OrderStatuses,
 } from '../Redux/interfaces';
-import { EnumSort } from '../utils/enums/enum.sort';
 import { instance } from './axios.instance';
 
 export const OrderApi = {

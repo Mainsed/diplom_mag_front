@@ -17,6 +17,7 @@ const mapStateToProps = (state: IState): Partial<IAppProps> => {
     state.order.orderError,
     state.store.storeError,
     state.delivery.deliveryError,
+    state.reports.reportsError,
   ];
 
   const errors = stateErrors.filter(

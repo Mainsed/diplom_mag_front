@@ -49,6 +49,11 @@ export interface IReports {
 
 export interface IReportsState {
   reports: IReports;
+  reportsError?: string;
+}
+
+export interface IReportsError {
+  error: string;
 }
 
 export interface IReportsProps {
