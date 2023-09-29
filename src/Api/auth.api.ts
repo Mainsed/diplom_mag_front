@@ -6,12 +6,15 @@ import {
   ILogout,
 } from '../Redux/interfaces';
 import { instance } from './axios.instance';
+import Cookies from 'js-cookie';
 
 export const AuthApi = {
   authorize: async (authData: IAuthorize): Promise<IAuthState> => {
     try {
       const auth = (await instance.post<IAuth>('auth/login', authData)).data;
-
+      const isAuthorized = Cookies.get('isAuthorized');
+      const userName = Cookies.get('userName');
+      console.log(isAuthorized, userName);
       return {
         auth,
       };
