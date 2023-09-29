@@ -23,7 +23,6 @@ const Header = (props: IHeaderProps) => {
     handleClose();
   };
   const handleClose = () => {
-    console.log(Cookies.get());
     setAnchorEl(null);
   };
 
