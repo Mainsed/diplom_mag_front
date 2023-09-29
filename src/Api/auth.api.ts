@@ -34,6 +34,9 @@ export const AuthApi = {
   logout: async (): Promise<ILogout> => {
     try {
       await instance.post<ILogout>('auth/logout');
+      Cookies.remove('isAuthorized');
+      Cookies.remove('userName');
+      Cookies.remove('accessToken');
       return {};
     } catch (e) {
       const error = e as AxiosError<any>;
