@@ -13,7 +13,7 @@ const App = (props: IAppProps) => {
   useEffect(() => {
     const isAuthorized = Cookies.get('isAuthorized');
     const userName = Cookies.get('userName');
-
+    console.log(isAuthorized, userName);
     props.setAuthorized(isAuthorized === 'true', userName);
   }, []);
 
