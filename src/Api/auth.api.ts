@@ -14,7 +14,8 @@ export const AuthApi = {
       const auth = (await instance.post<IAuth>('auth/login', authData)).data;
       const isAuthorized = Cookies.get('isAuthorized');
       const userName = Cookies.get('userName');
-      console.log(isAuthorized, userName);
+      const all = Cookies.get();
+      console.log(isAuthorized, userName, all);
       return {
         auth,
       };
@@ -30,6 +31,8 @@ export const AuthApi = {
   },
   logout: async (): Promise<ILogout> => {
     try {
+      const all = Cookies.get();
+      console.log(all);
       await instance.post<ILogout>('auth/logout');
       return {};
     } catch (e) {

@@ -19,6 +19,8 @@ const App = (props: IAppProps) => {
 
   useEffect(() => {
     props.errors.forEach((error) => {
+      const all = Cookies.get();
+      console.log(all);
       enqueueSnackbar(error, {
         variant: 'error',
         autoHideDuration: 5000,
