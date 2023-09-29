@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import './Header.css';
 import { IHeaderProps } from '../../Redux/interfaces/header.interface';
+import Cookies from 'js-cookie';
 
 const Header = (props: IHeaderProps) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -22,6 +23,7 @@ const Header = (props: IHeaderProps) => {
     handleClose();
   };
   const handleClose = () => {
+    console.log(Cookies.get());
     setAnchorEl(null);
   };
 
