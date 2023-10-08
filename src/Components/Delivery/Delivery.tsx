@@ -215,7 +215,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Створити товар
+            Створити поставку
           </Typography>
         </DialogTitle>
         <DialogContent>
@@ -332,7 +332,7 @@ const Delivery = (props: IDeliveryProps): JSX.Element => {
       >
         <DialogTitle>
           <Typography align="center" fontSize={'20px'}>
-            Редагувати товар
+            Редагувати поставку
           </Typography>
         </DialogTitle>
         <DialogContent>
